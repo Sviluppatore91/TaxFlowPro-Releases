@@ -4,12 +4,13 @@ import '../database/database_helper.dart';
 import 'package:provider/provider.dart';
 import '../providers/app_theme_provider.dart';
 import 'package:marquee/marquee.dart';
-import 'package:contabile_app/services/update_service.dart';
-import 'package:contabile_app/widgets/update_dialog.dart';
+import 'package:tax_flow_pro/services/update_service.dart';
+import 'package:tax_flow_pro/widgets/update_dialog.dart';
 import 'package:audioplayers/audioplayers.dart';
-import 'package:contabile_app/screens/invoices_screen.dart';
-import 'package:contabile_app/screens/security_center_screen.dart';
-import 'package:contabile_app/utils/calculation_engine.dart';
+import 'package:tax_flow_pro/screens/invoices_screen.dart';
+import 'package:tax_flow_pro/screens/security_center_screen.dart';
+import 'package:tax_flow_pro/utils/calculation_engine.dart';
+import '../utils/currency_utils.dart';
 
 class DashboardScreen extends StatefulWidget {
   final String role;
@@ -160,7 +161,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
             SizedBox(width: 8),
             Expanded(
               child: AutoScrollText(
-                text: 'BIMBOMIXER CONTABILITÀ $_selectedYear',
+                text: 'TaxFlowPro CONTABILITÀ $_selectedYear',
                 style: TextStyle(
                   color: Colors.white,
                   fontWeight: FontWeight.bold,
@@ -267,7 +268,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
               ),
               SizedBox(height: 8),
               Text(
-                '€ ${netto.toStringAsFixed(2)}',
+                CurrencyUtils.formatEuro(netto),
                 style: TextStyle(
                   color: Colors.white,
                   fontSize: 36,
@@ -299,7 +300,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     Icon(Icons.event_busy, color: Colors.orangeAccent, size: 13),
                     SizedBox(width: 4),
                     Text(
-                      '- € ${_totalDeadlinesPaid.toStringAsFixed(2)} scadenze pagate',
+                      '- € ${CurrencyUtils.formatUI(_totalDeadlinesPaid, decimals: 2)} scadenze pagate',
                       style: TextStyle(color: Colors.orangeAccent, fontSize: 12),
                     ),
                   ],
@@ -366,7 +367,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
             _metricCard(
               theme,
               "INCASSATO QUEST'ANNO",
-              '€ ${_totalIn.toStringAsFixed(2)}',
+              CurrencyUtils.formatEuro(_totalIn),
               inChange,
               Icons.arrow_downward,
               Colors.greenAccent,
@@ -374,7 +375,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
             _metricCard(
               theme,
               "SPESO QUEST'ANNO",
-              '€ ${_totalOut.toStringAsFixed(2)}',
+              CurrencyUtils.formatEuro(_totalOut),
               outChange,
               Icons.arrow_upward,
               Colors.redAccent,
@@ -397,7 +398,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
             _metricCard(
               theme,
               "MARGINE NETTO",
-              '${margin.toStringAsFixed(1)}%',
+              '${CurrencyUtils.formatUI(margin, decimals: 1)}%',
               'sull\'incassato',
               Icons.pie_chart,
               Colors.purpleAccent,
@@ -529,9 +530,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
     String formatEuro(double v) {
       if (v.abs() >= 1000) {
-        return '€${(v / 1000).toStringAsFixed(1)}k';
+        return CurrencyUtils.formatEuro((v / 1000)) + 'k';
       }
-      return '€${v.toStringAsFixed(0)}';
+      return CurrencyUtils.formatEuro(v);
     }
 
     return Container(
@@ -569,8 +570,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                             ? months[spot.x.toInt() - 1]
                             : '';
                         final euroVal = spot.y >= 0
-                            ? '€ ${spot.y.toStringAsFixed(2)}'
-                            : '- € ${spot.y.abs().toStringAsFixed(2)}';
+                            ? CurrencyUtils.formatEuro(spot.y)
+                            : '- ' + CurrencyUtils.formatEuro(spot.y.abs());
                         return LineTooltipItem(
                           '$month\n$euroVal',
                           TextStyle(
@@ -843,7 +844,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                 ),
                                 SizedBox(width: 4),
                                 Text(
-                                  '${pct.toStringAsFixed(0)}%',
+                                  '${CurrencyUtils.formatUI(pct, decimals: 0)}%',
                                   style: TextStyle(color: Colors.white.withOpacity(0.54), fontSize: 10),
                                 ),
                               ],
@@ -1076,7 +1077,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       ),
                     ),
                     Text(
-                      '€ ${p['amount'].toStringAsFixed(2)}',
+                      CurrencyUtils.formatEuro(p['amount']),
                       style: TextStyle(
                         color: isIN ? Colors.greenAccent : Colors.white,
                         fontWeight: FontWeight.bold,
@@ -1159,7 +1160,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       ),
                     ),
                     Text(
-                      '€ ${d['amount'].toStringAsFixed(2)}',
+                      CurrencyUtils.formatEuro(d['amount']),
                       style: TextStyle(
                         color: Colors.white,
                         fontWeight: FontWeight.bold,
@@ -1512,7 +1513,7 @@ class _PieChartFullScreenDialogState extends State<_PieChartFullScreenDialog>
                                       children: [
                                         Text('Totale', style: TextStyle(color: Colors.white.withOpacity(0.54), fontSize: 13)),
                                         Text(
-                                          '€ ${selected.value.toStringAsFixed(2)}',
+                                          CurrencyUtils.formatEuro(selected.value),
                                           style: TextStyle(
                                             color: selectedColor,
                                             fontSize: 20,
@@ -1536,7 +1537,7 @@ class _PieChartFullScreenDialogState extends State<_PieChartFullScreenDialog>
                                       children: [
                                         Text('% sul totale', style: TextStyle(color: Colors.white.withOpacity(0.54), fontSize: 13)),
                                         Text(
-                                          '${selectedPct.toStringAsFixed(1)}%',
+                                          '${CurrencyUtils.formatUI(selectedPct, decimals: 1)}%',
                                           style: TextStyle(
                                             color: Colors.white,
                                             fontSize: 18,
@@ -1594,7 +1595,7 @@ class _PieChartFullScreenDialogState extends State<_PieChartFullScreenDialog>
                                                   ),
                                                   SizedBox(width: 8),
                                                   Text(
-                                                    '€ ${e.value.toStringAsFixed(0)}',
+                                                    CurrencyUtils.formatEuro(e.value),
                                                     style: TextStyle(
                                                       color: Colors.white54,
                                                       fontSize: 11,
@@ -1602,7 +1603,7 @@ class _PieChartFullScreenDialogState extends State<_PieChartFullScreenDialog>
                                                   ),
                                                   SizedBox(width: 6),
                                                   Text(
-                                                    '${pct.toStringAsFixed(0)}%',
+                                                    '${CurrencyUtils.formatUI(pct, decimals: 0)}%',
                                                     style: TextStyle(color: Colors.white38, fontSize: 10),
                                                   ),
                                                 ],
@@ -1692,7 +1693,7 @@ class _PieChartFullScreenDialogState extends State<_PieChartFullScreenDialog>
                               ),
                               SizedBox(height: 4),
                               Text(
-                                '€ ${entry.value.toStringAsFixed(0)}  •  ${pct.toStringAsFixed(1)}%',
+                                '€ ${CurrencyUtils.formatUI(entry.value, decimals: 0)}  •  ${CurrencyUtils.formatUI(pct, decimals: 1)}%',
                                 style: TextStyle(color: color, fontSize: 10),
                               ),
                             ],

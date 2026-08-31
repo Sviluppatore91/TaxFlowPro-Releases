@@ -2,7 +2,7 @@ $ErrorActionPreference = "Stop"
 
 $token = Get-Content -Path "C:\Users\Hp\.github_token.txt" -Raw
 $token = $token.Trim()
-$repo = "BimboMixer-Releases/BimboMixer-Releases"
+$repo = "TaxFlowPro-Releases/TaxFlowPro-Releases"
 
 # Legge la versione automaticamente da pubspec.yaml
 $pubspecContent = Get-Content "pubspec.yaml" -Raw
@@ -15,13 +15,13 @@ if ($pubspecContent -match "version:\s*([\d.]+)\+") {
 
 $tag = "v$version"
 $releaseName = "Aggiornamento v$version"
-$body = "Nuovo aggiornamento v$version della Contabile App."
+$body = "Nuovo aggiornamento v$version della TaxFlowPro."
 
 Write-Host "=== Rilascio versione $version ===" -ForegroundColor Cyan
 
-$apkDestPath = "C:\Users\Hp\Desktop\CONTABILE APP\Aggiornamenti Apk Android\BimboMixer_v$($version)_update.apk"
-$pcAssetPath = "C:\Users\Hp\Desktop\CONTABILE APP\Aggiornamenti App PC\BimboMixer_v$($version).exe"
-$pcAssetName = "BimboMixer_v$($version).exe"
+$apkDestPath = "C:\Users\Hp\Desktop\TaxFlowPro\Aggiornamenti Apk Android\TaxFlowPro_v$($version)_update.apk"
+$pcAssetPath = "C:\Users\Hp\Desktop\TaxFlowPro\Aggiornamenti App PC\TaxFlowPro_v$($version).exe"
+$pcAssetName = "TaxFlowPro_v$($version).exe"
 $pcContentType = "application/x-msdownload"
 
 if (-not (Test-Path $apkDestPath)) { Write-Error "APK non trovato: $apkDestPath"; exit 1 }
@@ -75,7 +75,7 @@ if ($existingRelease) {
     }
 }
 
-Upload-Asset -FilePath $apkDestPath -FileName "BimboMixer_v$($version)_update.apk" -ContentType "application/vnd.android.package-archive"
+Upload-Asset -FilePath $apkDestPath -FileName "TaxFlowPro_v$($version)_update.apk" -ContentType "application/vnd.android.package-archive"
 Upload-Asset -FilePath $pcAssetPath -FileName $pcAssetName -ContentType $pcContentType
 
 Write-Host "`n✅ Tutto completato! Versione v$version pubblicata su GitHub." -ForegroundColor Green

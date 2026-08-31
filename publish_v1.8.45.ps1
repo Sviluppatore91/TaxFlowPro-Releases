@@ -1,6 +1,6 @@
 $token = Get-Content "C:\Users\Hp\Documents\Sviluppo\Token di accesso\token.txt" -Raw
 $token = $token.Trim()
-$repo = "BimboMixer-Releases/BimboMixer-Releases"
+$repo = "TaxFlowPro-Releases/TaxFlowPro-Releases"
 $version = "1.8.45"
 
 $headers = @{
@@ -40,8 +40,8 @@ if ($null -eq $releaseResponse) {
 $uploadUrl = $releaseResponse.upload_url.Split('{')[0]
 
 # Upload APK
-$apkPath = "C:\Users\Hp\Desktop\CONTABILE APP Bimbomixer\Contabile_Bimbomixer_v1.8.45.apk"
-$apkName = "Contabile_Bimbomixer_v1.8.45.apk"
+$apkPath = "C:\Users\Hp\Desktop\TaxFlowPro\Contabile_TaxFlowPro_v1.8.45.apk"
+$apkName = "Contabile_TaxFlowPro_v1.8.45.apk"
 $apkUploadUrl = $uploadUrl + "?name=" + $apkName
 
 $uploadHeadersApk = @{
@@ -59,8 +59,8 @@ try {
 }
 
 # Upload ZIP
-$zipPath = "C:\Users\Hp\Desktop\CONTABILE APP Bimbomixer\Contabile_Bimbomixer_Windows_v1.8.45.zip"
-$zipName = "Contabile_Bimbomixer_Windows_v1.8.45.zip"
+$zipPath = "C:\Users\Hp\Desktop\TaxFlowPro\Contabile_TaxFlowPro_Windows_v1.8.45.zip"
+$zipName = "Contabile_TaxFlowPro_Windows_v1.8.45.zip"
 $zipUploadUrl = $uploadUrl + "?name=" + $zipName
 
 $uploadHeadersZip = @{

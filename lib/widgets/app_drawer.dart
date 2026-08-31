@@ -88,7 +88,7 @@ class AppDrawer extends StatelessWidget {
                       stops: const [0.0, 0.5, 1.0],
                     ).createShader(bounds),
                     child: Text(
-                      'Bimbomixer Contabilità',
+                      'TaxFlowPro Contabilità',
                       style: TextStyle(
                         color: Colors.white,
                         fontSize: 20,

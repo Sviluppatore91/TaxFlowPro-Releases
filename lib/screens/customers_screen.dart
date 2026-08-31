@@ -1,4 +1,5 @@
 import 'dart:io';
+import '../utils/currency_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
@@ -10,6 +11,7 @@ import '../widgets/gradient_scaffold.dart';
 import '../widgets/glass_container.dart';
 import '../services/pdf_report_service.dart';
 import '../utils/report_utils.dart';
+import '../utils/currency_utils.dart';
 import 'package:pdf/widgets.dart' as pw;
 
 class CustomersScreen extends StatefulWidget {
@@ -824,7 +826,7 @@ class _CustomersScreenState extends State<CustomersScreen> {
                 else if (metodo.toLowerCase() == 'assegno') metodo = 'ASS';
                 else if (metodo.toLowerCase() == 'pos') metodo = 'POS';
                 
-                final importo = '${double.tryParse(p['amount']?.toString() ?? '0')?.toStringAsFixed(2) ?? '0.00'} €';
+                final importo = CurrencyUtils.formatEuro(double.tryParse(p['amount']?.toString() ?? '0') ?? 0);
                 
                 final hasAtt = p['attachments'] != null && p['attachments'] != '[]';
                 final allegati = hasAtt ? 'S' : 'N';
@@ -905,7 +907,7 @@ class _CustomersScreenState extends State<CustomersScreen> {
                 title: Row(
                   children: [
                     Text(
-                      '€ ${payment['amount'].toStringAsFixed(2)}',
+                      CurrencyUtils.formatEuro(payment['amount']),
                       style: TextStyle(
                         color: isIncome ? Colors.greenAccent : Colors.redAccent,
                         fontWeight: FontWeight.bold,

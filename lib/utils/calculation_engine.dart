@@ -1,5 +1,5 @@
-import 'package:contabile_app/utils/currency_utils.dart';
-import 'package:contabile_app/models/dashboard_metrics.dart';
+import 'package:tax_flow_pro/utils/currency_utils.dart';
+import 'package:tax_flow_pro/models/dashboard_metrics.dart';
 
 /// Pure calculation engine. Does not depend on UI, Firebase, or external state.
 /// Ensures all financial mathematics are strictly controlled and tested.
@@ -138,7 +138,7 @@ class CalculationEngine {
     }
     double change = ((current - previous) / previous) * 100;
     String prefix = change > 0 ? '+' : '';
-    return '$prefix${change.toStringAsFixed(1)}%';
+    return '$prefix${CurrencyUtils.formatUI(change, decimals: 1)}%';
   }
 }
 

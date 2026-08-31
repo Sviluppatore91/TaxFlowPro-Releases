@@ -6,8 +6,8 @@ if ($pubspecContent -match "version:\s*([\d.]+)\+") {
     exit 1
 }
 $winReleasePath = 'build\windows\x64\runner\Release'
-$pcDestDir = 'C:\Users\Hp\Desktop\CONTABILE APP\Aggiornamenti App PC'
-$apkDestDir = 'C:\Users\Hp\Desktop\CONTABILE APP\Aggiornamenti Apk Android'
+$pcDestDir = 'C:\Users\Hp\Desktop\TaxFlowPro\Aggiornamenti App PC'
+$apkDestDir = 'C:\Users\Hp\Desktop\TaxFlowPro\Aggiornamenti Apk Android'
 $winrar = "C:\Program Files\WinRAR\WinRAR.exe"
 $iconPath = (Resolve-Path "windows\runner\resources\app_icon.ico").Path
 
@@ -22,7 +22,7 @@ Remove-Item "$pcDestDir\*" -Force -ErrorAction SilentlyContinue
 # Copia APK
 $apkSrc = 'build\app\outputs\flutter-apk\app-release.apk'
 if (Test-Path $apkSrc) {
-    $apkDest = "$apkDestDir\BimboMixer_v${version}_update.apk"
+    $apkDest = "$apkDestDir\TaxFlowPro_v${version}_update.apk"
     Copy-Item $apkSrc $apkDest -Force
     Write-Host "APK copiato: $apkDest"
 } else {
@@ -30,12 +30,12 @@ if (Test-Path $apkSrc) {
 }
 
 # Crea file eseguibile Auto-estraente (SFX) per PC con ICONA
-if (Test-Path "$winReleasePath\contabile_app.exe") {
-    $exeDest = "$pcDestDir\BimboMixer_v${version}.exe"
+if (Test-Path "$winReleasePath\tax_flow_pro.exe") {
+    $exeDest = "$pcDestDir\TaxFlowPro_v${version}.exe"
     
     # Crea il file di configurazione SFX temporaneo
     $sfxConfig = @"
-Setup=contabile_app.exe
+Setup=tax_flow_pro.exe
 TempMode
 Silent=1
 Overwrite=1
@@ -60,4 +60,4 @@ Overwrite=1
     Write-Host "Attenzione: Eseguibile Windows non trovato in $winReleasePath. Assicurati di aver eseguito 'flutter build windows'."
 }
 
-Write-Host 'Esportazione completata in CONTABILE APP!'
+Write-Host 'Esportazione completata in TaxFlowPro!'

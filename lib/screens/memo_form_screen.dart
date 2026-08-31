@@ -1,4 +1,4 @@
-Ôªøimport 'dart:io';
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:dropdown_search/dropdown_search.dart';
@@ -91,7 +91,7 @@ class _MemoFormScreenState extends State<MemoFormScreen> {
       }
 
       if (_memoType == 'MOVIMENTO') {
-        _dateCtrl.text = DateUtilsApp.formatDbDate(m['date']?.toString(), 'dd/MM/yyyy'); // Verr√† aggiornato in build in base al tema
+        _dateCtrl.text = DateUtilsApp.formatDbDate(m['date']?.toString(), 'dd/MM/yyyy'); // Verr‡ aggiornato in build in base al tema
         _paymentMethod = m['payment_method'] ?? 'Bonifico';
         _invoiceDateCtrl.text = DateUtilsApp.formatDbDate(m['invoice_date']?.toString(), 'dd/MM/yyyy');
       } else {
@@ -424,7 +424,7 @@ class _MemoFormScreenState extends State<MemoFormScreen> {
                     keyboardType: const TextInputType.numberWithOptions(decimal: true),
                     decoration: InputDecoration(
                       labelText: 'Importo',
-                      prefixText: '‚Ç¨ ',
+                      prefixText: 'Ä ',
                       prefixStyle: TextStyle(color: Colors.white),
                       labelStyle: TextStyle(color: Colors.white.withOpacity(0.54)),
                     ),

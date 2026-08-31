@@ -1,7 +1,7 @@
 $version = "1.8.46"
-$desktop = "$env:USERPROFILE\Desktop\CONTABILE APP Bimbomixer"
-$apkName = "Contabile_Bimbomixer_v$version.apk"
-$zipName = "Contabile_Bimbomixer_Windows_v$version.zip"
+$desktop = "$env:USERPROFILE\Desktop\TaxFlowPro"
+$apkName = "Contabile_TaxFlowPro_v$version.apk"
+$zipName = "Contabile_TaxFlowPro_Windows_v$version.zip"
 
 Write-Host "Building Windows..."
 flutter build windows
@@ -15,7 +15,7 @@ Copy-Item "build\app\outputs\flutter-apk\app-release.apk" -Destination "$desktop
 
 $token = Get-Content "C:\Users\Hp\Documents\Sviluppo\Token di accesso\token.txt" -Raw
 $token = $token.Trim()
-$repo = "BimboMixer-Releases/BimboMixer-Releases"
+$repo = "TaxFlowPro-Releases/TaxFlowPro-Releases"
 
 $headers = @{
     "Authorization" = "token $token"

@@ -2,7 +2,7 @@ $ErrorActionPreference = "Stop"
 
 $token = Get-Content -Path "C:\Users\Hp\Documents\Sviluppo\Token di accesso\token.txt" -Raw
 $token = $token.Trim()
-$repo = "BimboMixer-Releases/BimboMixer-Releases"
+$repo = "TaxFlowPro-Releases/TaxFlowPro-Releases"
 
 $pubspecContent = Get-Content "pubspec.yaml" -Raw
 if ($pubspecContent -match "version:\s*([\d.]+)\+") {
@@ -14,7 +14,7 @@ if ($pubspecContent -match "version:\s*([\d.]+)\+") {
 
 $tag = "v$version"
 $releaseName = "Aggiornamento v$version"
-$body = "Nuovo aggiornamento v$version della Contabile App."
+$body = "Nuovo aggiornamento v$version della TaxFlowPro."
 
 Write-Host "=== Rilascio versione $version ===" -ForegroundColor Cyan
 
@@ -45,8 +45,8 @@ if ($releaseResponse.id -eq $null) {
 Write-Host "Release ID: $releaseId" -ForegroundColor Green
 
 # Step 2: Upload assets via curl
-$apkPath = "C:\Users\Hp\Desktop\Contabile APP Bimbomixer\BimboMixer_v${version}_update.apk"
-$zipPath = "C:\Users\Hp\Desktop\Contabile APP Bimbomixer\BimboMixer_v${version}_portable.zip"
+$apkPath = "C:\Users\Hp\Desktop\TaxFlowPro\TaxFlowPro_v${version}_update.apk"
+$zipPath = "C:\Users\Hp\Desktop\TaxFlowPro\TaxFlowPro_v${version}_portable.zip"
 
 if (Test-Path $apkPath) {
     Write-Host "Uploading APK..."

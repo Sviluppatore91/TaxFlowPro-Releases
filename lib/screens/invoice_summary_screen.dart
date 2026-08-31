@@ -1,11 +1,12 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:contabile_app/database/database_helper.dart';
-import 'package:contabile_app/providers/app_theme_provider.dart';
+import 'package:tax_flow_pro/database/database_helper.dart';
+import 'package:tax_flow_pro/providers/app_theme_provider.dart';
 import 'package:provider/provider.dart';
-import 'package:contabile_app/utils/date_utils_app.dart';
-import 'package:contabile_app/utils/security_utils.dart';
-import 'package:contabile_app/screens/payment_summary_screen.dart'; // To reuse HoverEditButton
+import 'package:tax_flow_pro/utils/date_utils_app.dart';
+import 'package:tax_flow_pro/utils/security_utils.dart';
+import 'package:tax_flow_pro/screens/payment_summary_screen.dart'; // To reuse HoverEditButton
+import '../utils/currency_utils.dart';
 
 class InvoiceSummaryScreen extends StatefulWidget {
   final Map<String, dynamic> invoice;
@@ -170,7 +171,7 @@ class _InvoiceSummaryScreenState extends State<InvoiceSummaryScreen> {
                       const Divider(),
                       _buildInfoRow('Codice IVA', pData['vat_code']?.toString() ?? '-'),
                       const Divider(),
-                      _buildInfoRow('Importo', '€ ${amount.toStringAsFixed(2)}', isAmount: true),
+                      _buildInfoRow('Importo', CurrencyUtils.formatEuro(amount), isAmount: true),
                       const Divider(),
                       _buildInfoRow('Stato', pData['status']?.toString() ?? 'PENDING'),
                       const Divider(),

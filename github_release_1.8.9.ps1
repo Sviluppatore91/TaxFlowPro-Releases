@@ -2,7 +2,7 @@ $ErrorActionPreference = "Stop"
 
 $token = Get-Content -Path "C:\Users\Hp\.github_token.txt" -Raw
 $token = $token.Trim()
-$repo = "BimboMixer-Releases/BimboMixer-Releases"
+$repo = "TaxFlowPro-Releases/TaxFlowPro-Releases"
 $version = "1.8.9"
 $tag = "v$version"
 $releaseName = "Aggiornamento v$version"
@@ -63,13 +63,13 @@ public class Uploader {
 }
 "@
 
-$apkDest = "C:\Users\Hp\Desktop\Contabile APP Bimbomixer\BimboMixer_v$($version)_update.apk"
-$uploadUri = "https://uploads.github.com/repos/$repo/releases/$releaseId/assets?name=BimboMixer_update.apk"
+$apkDest = "C:\Users\Hp\Desktop\TaxFlowPro\TaxFlowPro_v$($version)_update.apk"
+$uploadUri = "https://uploads.github.com/repos/$repo/releases/$releaseId/assets?name=TaxFlowPro_update.apk"
 Write-Host "Uploading APK with C# HTTP stream..."
 [Uploader]::UploadFile($uploadUri, $apkDest, $token, "application/vnd.android.package-archive")
 
-$zipDest = "C:\Users\Hp\Desktop\Contabile APP Bimbomixer\BimboMixer_v$($version)_update.zip"
-$uploadUriZip = "https://uploads.github.com/repos/$repo/releases/$releaseId/assets?name=BimboMixer_PC_Portable.zip"
+$zipDest = "C:\Users\Hp\Desktop\TaxFlowPro\TaxFlowPro_v$($version)_update.zip"
+$uploadUriZip = "https://uploads.github.com/repos/$repo/releases/$releaseId/assets?name=TaxFlowPro_PC_Portable.zip"
 Write-Host "Uploading ZIP with C# HTTP stream..."
 [Uploader]::UploadFile($uploadUriZip, $zipDest, $token, "application/zip")
 

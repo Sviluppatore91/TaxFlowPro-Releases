@@ -1,5 +1,5 @@
-﻿import 'package:flutter_test/flutter_test.dart';
-import 'package:contabile_app/utils/calculation_engine.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:tax_flow_pro/utils/calculation_engine.dart';
 
 void main() {
   // Helper per creare un pagamento
@@ -553,15 +553,15 @@ void main() {
   // ─── PERCENTAGE CHANGE ───
   group('CalculationEngine.computePercentageChange', () {
     test('crescita del 100%', () {
-      expect(CalculationEngine.computePercentageChange(2000, 1000), '+100.0%');
+      expect(CalculationEngine.computePercentageChange(2000, 1000), '+100,0%');
     });
 
     test('calo del 50%', () {
-      expect(CalculationEngine.computePercentageChange(500, 1000), '-50.0%');
+      expect(CalculationEngine.computePercentageChange(500, 1000), '-50,0%');
     });
 
     test('nessuna variazione', () {
-      expect(CalculationEngine.computePercentageChange(1000, 1000), '0.0%');
+      expect(CalculationEngine.computePercentageChange(1000, 1000), '0,0%');
     });
 
     test('anno precedente a zero con valore corrente positivo', () {
@@ -573,7 +573,7 @@ void main() {
     });
 
     test('variazione negativa con current a zero', () {
-      expect(CalculationEngine.computePercentageChange(0, 1000), '-100.0%');
+      expect(CalculationEngine.computePercentageChange(0, 1000), '-100,0%');
     });
   });
 }

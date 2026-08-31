@@ -1,21 +1,21 @@
 {
   "project_info": {
-    "project_number": "960735169197",
-    "project_id": "contabilita-8dd6d",
-    "storage_bucket": "contabilita-8dd6d.firebasestorage.app"
+    "project_number": "573034076947",
+    "project_id": "taxflowpro-f914c",
+    "storage_bucket": "taxflowpro-f914c.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:960735169197:android:40cc9ea0aebe99740b1424",
+        "mobilesdk_app_id": "1:573034076947:android:01b8bf609883e7b06d98e6",
         "android_client_info": {
-          "package_name": "com.example.contabile_app"
+          "package_name": "com.taxflowpro"
         }
       },
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyBNFN1Xe6o_eXbXmf36ZON905M-Kgi8O08"
+          "current_key": "AIzaSyCe9wPpbtuxX4XW5N3bND4L4aSz5OaErhI"
         }
       ],
       "services": {

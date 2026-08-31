@@ -1,5 +1,5 @@
-﻿import 'package:flutter_test/flutter_test.dart';
-import 'package:contabile_app/utils/currency_utils.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:tax_flow_pro/utils/currency_utils.dart';
 import 'package:intl/intl.dart';
 
 void main() {
@@ -116,34 +116,32 @@ void main() {
   });
 
   group('CurrencyUtils.formatEuro', () {
-    final formatter = NumberFormat.currency(
-      locale: 'it_IT',
-      symbol: '\u20AC',
-      decimalDigits: 2,
-    );
-
     test('formatta importo positivo', () {
-      expect(CurrencyUtils.formatEuro(1200.5), formatter.format(1200.5));
+      expect(CurrencyUtils.formatEuro(1200.5), '€ 1200,50');
     });
 
     test('formatta intero', () {
-      expect(CurrencyUtils.formatEuro(1200), formatter.format(1200));
+      expect(CurrencyUtils.formatEuro(1200), '€ 1200,00');
     });
 
     test('formatta zero', () {
-      expect(CurrencyUtils.formatEuro(0), formatter.format(0));
+      expect(CurrencyUtils.formatEuro(0), '€ 0,00');
     });
 
     test('formatta importo negativo', () {
-      expect(CurrencyUtils.formatEuro(-50.25), formatter.format(-50.25));
+      expect(CurrencyUtils.formatEuro(-50.25), '€ -50,25');
     });
 
     test('formatta importo con molti decimali (troncati a 2)', () {
-      expect(CurrencyUtils.formatEuro(123.456), formatter.format(123.456));
+      expect(CurrencyUtils.formatEuro(123.456), '€ 123,46');
+    });
+
+    test('formatta sopra 9999 (es 10000)', () {
+      expect(CurrencyUtils.formatEuro(10000.50), '€ 10.000,50');
     });
 
     test('formatta milioni', () {
-      expect(CurrencyUtils.formatEuro(1234567.89), formatter.format(1234567.89));
+      expect(CurrencyUtils.formatEuro(1234567.89), '€ 1.234.567,89');
     });
 
     test('contiene il simbolo euro', () {

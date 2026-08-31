@@ -1,12 +1,12 @@
 $version = "v1.8.32"
-$apkName = "BimboMixer_${version}_update.apk"
-$apkDest = "C:\Users\Hp\Desktop\Contabile APP Bimbomixer\$apkName"
+$apkName = "TaxFlowPro_${version}_update.apk"
+$apkDest = "C:\Users\Hp\Desktop\TaxFlowPro\$apkName"
 
 $token = Get-Content -Path "C:\Users\Hp\Documents\Sviluppo\Token di accesso\token.txt" -Raw
 $token = $token.Trim()
 
 if ($token) {
-    $repo = "Giacomo3192/BimboMixer"
+    $repo = "Giacomo3192/TaxFlowPro"
     $headers = @{
         "Authorization" = "token $token"
         "Accept" = "application/vnd.github.v3+json"

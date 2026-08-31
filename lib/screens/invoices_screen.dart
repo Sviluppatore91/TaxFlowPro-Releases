@@ -1,10 +1,11 @@
 import 'dart:io';
+import '../utils/currency_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../database/database_helper.dart';
-import 'package:contabile_app/providers/app_theme_provider.dart';
-import 'package:contabile_app/screens/invoice_summary_screen.dart';
+import 'package:tax_flow_pro/providers/app_theme_provider.dart';
+import 'package:tax_flow_pro/screens/invoice_summary_screen.dart';
 import 'package:dropdown_search/dropdown_search.dart';
 import '../services/attachment_service.dart';
 import '../services/pdf_report_service.dart';
@@ -12,6 +13,7 @@ import '../utils/report_utils.dart';
 import '../utils/security_utils.dart';
 import '../utils/date_utils_app.dart';
 import 'package:intl/intl.dart';
+import '../utils/currency_utils.dart';
 import 'package:pdf/widgets.dart' as pw;
 
 class InvoicesScreen extends StatefulWidget {
@@ -639,7 +641,7 @@ class _InvoicesScreenState extends State<InvoicesScreen> {
               final List<List<String>> data = filteredInvoices.map<List<String>>((i) {
                 final date = DateUtilsApp.formatDbDate(i['date']?.toString(), theme.dateFormat);
                 final num = i['number']?.toString() ?? '-';
-                final amount = '${double.tryParse(i['amount']?.toString() ?? '0')?.toStringAsFixed(2) ?? '0.00'} €';
+                final amount = CurrencyUtils.formatEuro(double.tryParse(i['amount']?.toString() ?? '0') ?? 0);
                 final status = i['status'] == 'PAID' ? 'INC' : i['status'] == 'LATE' ? 'RIT' : 'DA_INC';
                 
                 final customer = _getCustomer(i['customer_id']?.toString());
@@ -788,7 +790,7 @@ class _InvoicesScreenState extends State<InvoicesScreen> {
                                   ),
                                 ),
                                 SizedBox(width: 8),
-                                Text('€ ${invoice['amount'].toStringAsFixed(2)}',
+                                Text(CurrencyUtils.formatEuro(invoice['amount']),
                                     style: TextStyle(
                                         color: Colors.white,
                                         fontWeight: FontWeight.bold,

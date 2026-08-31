@@ -3,7 +3,7 @@ $ErrorActionPreference = "Stop"
 
 $token = Get-Content -Path "C:\Users\Hp\Documents\Sviluppo\Token di accesso\token.txt" -Raw
 $token = $token.Trim()
-$repo = "BimboMixer-Releases/BimboMixer-Releases"
+$repo = "Sviluppatore91/TaxFlowPro-Releases"
 
 # Legge la versione automaticamente da pubspec.yaml
 $pubspecContent = Get-Content "pubspec.yaml" -Raw
@@ -16,7 +16,7 @@ if ($pubspecContent -match "version:\s*([\d.]+)\+") {
 
 $tag = "v$version"
 $releaseName = "Aggiornamento v$version"
-$body = "Nuovo aggiornamento v$version della Contabile App."
+$body = "Nuovo aggiornamento v$version della TaxFlowPro."
 
 Write-Host "=== Rilascio versione $version ===" -ForegroundColor Cyan
 
@@ -32,7 +32,7 @@ if ($LASTEXITCODE -ne 0) { Write-Error "Build Windows fallita!"; exit 1 }
 
 # dart run msix:create rimosso perche causa freeze
 
-$msixExists = Test-Path "build\windows\x64\runner\Release\contabile_app.msix"
+$msixExists = Test-Path "build\windows\x64\runner\Release\tax_flow_pro.msix"
 if (-not $msixExists) {
     Write-Host "  MSIX non generato, creo il portable ZIP come alternativa..." -ForegroundColor DarkYellow
 }
@@ -40,37 +40,37 @@ if (-not $msixExists) {
 # ————————————————————————————————————————————————————————————————————————————————
 Write-Host "`n[3/4] Copia locale su Desktop..." -ForegroundColor Yellow
 
-# Directory di esportazione finali (senza sottocartelle Android e PC, tutto nella stessa cartella Bimbomixer come richiesto)
-$destDir = "C:\Users\Hp\Desktop\Contabile APP Bimbomixer"
+# Directory di esportazione finali (senza sottocartelle Android e PC, tutto nella stessa cartella TaxFlowPro come richiesto)
+$destDir = "C:\Users\Hp\Desktop\TaxFlowPro"
 if (-not (Test-Path $destDir)) { New-Item -ItemType Directory -Force -Path $destDir | Out-Null }
 
 # APK
 $apkSrcPath = "build\app\outputs\flutter-apk\app-release.apk"
-$apkDestPath = "$destDir\BimboMixer_v$($version)_update.apk"
+$apkDestPath = "$destDir\TaxFlowPro_v$($version)_update.apk"
 Copy-Item $apkSrcPath $apkDestPath -Force
 Write-Host "APK copiato: $apkDestPath"
 
 # MSIX o Portable ZIP
 
-$msixSrcPath = "build\windows\x64\runner\Release\contabile_app.msix"
+$msixSrcPath = "build\windows\x64\runner\Release\tax_flow_pro.msix"
 $winReleasePath = "build\windows\x64\runner\Release"
 $pcAssetPath = $null
 $pcAssetName = $null
 $pcContentType = $null
 
 if (Test-Path $msixSrcPath) {
-    $pcAssetPath = "$destDir\BimboMixer_v$($version)_update.msix"
+    $pcAssetPath = "$destDir\TaxFlowPro_v$($version)_update.msix"
     Copy-Item $msixSrcPath $pcAssetPath -Force
     Write-Host "MSIX copiato: $pcAssetPath"
-    $pcAssetName = "BimboMixer_v$($version)_update.msix"
+    $pcAssetName = "TaxFlowPro_v$($version)_update.msix"
     $pcContentType = "application/msix"
 } else {
     # Fallback: crea un portable ZIP
-    $zipPath = "$destDir\BimboMixer_v$($version)_portable.zip"
+    $zipPath = "$destDir\TaxFlowPro_v$($version)_portable.zip"
     Write-Host "  Creo portable ZIP da $winReleasePath..." -ForegroundColor DarkCyan
     Compress-Archive -Path "$winReleasePath\*" -DestinationPath $zipPath -Force
     $pcAssetPath = $zipPath
-    $pcAssetName = "BimboMixer_v$($version)_portable.zip"
+    $pcAssetName = "TaxFlowPro_v$($version)_portable.zip"
     $pcContentType = "application/zip"
     Write-Host "Portable ZIP creato: $zipPath"
 }
@@ -126,7 +126,7 @@ if ($existingRelease) {
     }
 }
 
-Upload-Asset -FilePath $apkDestPath -FileName "BimboMixer_v$($version)_update.apk" -ContentType "application/vnd.android.package-archive"
+Upload-Asset -FilePath $apkDestPath -FileName "TaxFlowPro_v$($version)_update.apk" -ContentType "application/vnd.android.package-archive"
 Upload-Asset -FilePath $pcAssetPath -FileName $pcAssetName -ContentType $pcContentType
 
 Write-Host "`nTutto completato! Versione v$version pubblicata su GitHub." -ForegroundColor Green

@@ -3,7 +3,7 @@ $token = Get-Content -Path "C:\Users\Hp\.github_token.txt" -Raw
 $token = $token.Trim()
 $releaseId = "366509804"
 $version = "1.8.10"
-$repo = "BimboMixer-Releases/BimboMixer-Releases"
+$repo = "TaxFlowPro-Releases/TaxFlowPro-Releases"
 
 Add-Type -Language CSharp -TypeDefinition @"
 using System;
@@ -40,7 +40,7 @@ public class Uploader {
 }
 "@
 
-$zipDest = "C:\Users\Hp\Desktop\Contabile APP Bimbomixer\BimboMixer_v$($version)_update.zip"
-$uploadUriZip = "https://uploads.github.com/repos/$repo/releases/$releaseId/assets?name=BimboMixer_PC_Portable.zip"
+$zipDest = "C:\Users\Hp\Desktop\TaxFlowPro\TaxFlowPro_v$($version)_update.zip"
+$uploadUriZip = "https://uploads.github.com/repos/$repo/releases/$releaseId/assets?name=TaxFlowPro_PC_Portable.zip"
 Write-Host "Uploading ZIP with C# HTTP stream..."
 [Uploader]::UploadFile($uploadUriZip, $zipDest, $token, "application/zip")

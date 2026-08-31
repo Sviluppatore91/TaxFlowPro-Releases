@@ -6,7 +6,7 @@ $body = "Nuovo aggiornamento v$version con UI per Inserimento/Modifica Fatture c
 
 $apkPath = "build\app\outputs\flutter-apk\app-release.apk"
 $windowsBuildDir = "build\windows\x64\runner\Release"
-$zipPath = "build\windows\x64\runner\BimboMixer_PC_Portable.zip"
+$zipPath = "build\windows\x64\runner\TaxFlowPro_PC_Portable.zip"
 
 $desktopDir = "C:\Users\Hp\Desktop\Aggiornamenti App"
 $apkDestDir = "$desktopDir\Aggiornamenti Apk Android"
@@ -14,8 +14,8 @@ $zipDestDir = "$desktopDir\Aggiornamenti App PC"
 New-Item -ItemType Directory -Force -Path $apkDestDir | Out-Null
 New-Item -ItemType Directory -Force -Path $zipDestDir | Out-Null
 
-$apkDest = "$apkDestDir\BimboMixer_v$($version)_update.apk"
-$zipDest = "$zipDestDir\BimboMixer_v$($version)_update.zip"
+$apkDest = "$apkDestDir\TaxFlowPro_v$($version)_update.apk"
+$zipDest = "$zipDestDir\TaxFlowPro_v$($version)_update.zip"
 
 Write-Host "1. Compilando Android APK..."
 flutter build apk --release
@@ -25,7 +25,7 @@ flutter build windows --release
 
 Write-Host "3. Creando MSIX Installer per Windows..."
 flutter pub run msix:create
-$msixPath = "build\windows\x64\runner\Release\contabile_app.msix"
+$msixPath = "build\windows\x64\runner\Release\tax_flow_pro.msix"
 
 Write-Host "4. Copiando i file nelle cartelle Desktop..."
 Copy-Item -Path $apkPath -Destination $apkDest -Force
@@ -34,7 +34,7 @@ Write-Host "Copia completata: $apkDest e $zipDest"
 
 Write-Host "5. Uploading su GitHub Releases..."
 $token = (Get-Content -Path "C:\Users\Hp\.github_token.txt" -Raw).Trim()
-$repo = "BimboMixer-Releases/BimboMixer-Releases"
+$repo = "TaxFlowPro-Releases/TaxFlowPro-Releases"
 $headers = @{
     "Authorization" = "token $token"
     "Accept" = "application/vnd.github.v3+json"
@@ -88,11 +88,11 @@ public class Uploader {
 }
 "@
 
-$uploadUri = "https://uploads.github.com/repos/$repo/releases/$releaseId/assets?name=BimboMixer_update.apk"
+$uploadUri = "https://uploads.github.com/repos/$repo/releases/$releaseId/assets?name=TaxFlowPro_update.apk"
 Write-Host "Uploading APK..."
 [Uploader]::UploadFile($uploadUri, $apkDest, $token, "application/vnd.android.package-archive")
 
-$uploadUriZip = "https://uploads.github.com/repos/$repo/releases/$releaseId/assets?name=BimboMixer_PC_Installer.msix"
+$uploadUriZip = "https://uploads.github.com/repos/$repo/releases/$releaseId/assets?name=TaxFlowPro_PC_Installer.msix"
 Write-Host "Uploading MSIX..."
 [Uploader]::UploadFile($uploadUriZip, $zipDest, $token, "application/msix")
 

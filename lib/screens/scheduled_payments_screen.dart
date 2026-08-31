@@ -8,6 +8,8 @@ import '../services/pdf_report_service.dart';
 import '../utils/report_utils.dart';
 import '../utils/security_utils.dart';
 import '../utils/date_utils_app.dart';
+import 'package:intl/intl.dart';
+import '../utils/currency_utils.dart';
 import 'package:pdf/widgets.dart' as pw;
 
 class ScheduledPaymentsScreen extends StatefulWidget {
@@ -190,7 +192,7 @@ class _ScheduledPaymentsScreenState extends State<ScheduledPaymentsScreen> {
                   metodo = 'POS';
 
                 final importo =
-                    '${double.tryParse(p['amount']?.toString() ?? '0')?.toStringAsFixed(2) ?? '0.00'} €';
+                    CurrencyUtils.formatEuro(double.tryParse(p['amount']?.toString() ?? '0') ?? 0);
 
                 final hasAtt =
                     p['attachments'] != null && p['attachments'] != '[]';
@@ -386,7 +388,7 @@ class _ScheduledPaymentsScreenState extends State<ScheduledPaymentsScreen> {
                               crossAxisAlignment: CrossAxisAlignment.end,
                               children: [
                                 Text(
-                                  '€ ${double.tryParse(p['amount']?.toString() ?? '0')?.toStringAsFixed(2) ?? '0.00'}',
+                                  CurrencyUtils.formatEuro(double.tryParse(p['amount']?.toString() ?? '0') ?? 0),
                                   style: TextStyle(
                                     color: (p['status'] == 'Pagato' || p['status'] == 'PAID') ? Colors.greenAccent : (isIN ? Colors.greenAccent : Colors.redAccent),
                                     fontWeight: FontWeight.bold,

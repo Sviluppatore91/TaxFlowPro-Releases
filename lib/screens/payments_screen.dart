@@ -8,6 +8,7 @@ import '../services/pdf_report_service.dart';
 import '../utils/report_utils.dart';
 import '../utils/security_utils.dart';
 import '../utils/date_utils_app.dart';
+import '../utils/currency_utils.dart';
 import 'package:pdf/widgets.dart' as pw;
 
 class PaymentsScreen extends StatefulWidget {
@@ -132,7 +133,7 @@ class _PaymentsScreenState extends State<PaymentsScreen> {
                   else if (metodo.toLowerCase() == 'assegno') metodo = 'ASS';
                   else if (metodo.toLowerCase() == 'pos') metodo = 'POS';
                   
-                  final importo = '${double.tryParse(p['amount']?.toString() ?? '0')?.toStringAsFixed(2) ?? '0.00'} €';
+                  final importo = CurrencyUtils.formatEuro(double.tryParse(p['amount']?.toString() ?? '0') ?? 0);
                   
                   final hasAtt = p['attachments'] != null && p['attachments'] != '[]';
                   final allegati = hasAtt ? 'S' : 'N';
@@ -244,7 +245,7 @@ class _PaymentsScreenState extends State<PaymentsScreen> {
                                 child: Icon(Icons.attachment, color: Colors.blueAccent, size: 20),
                               ),
                             Text(
-                              '${double.tryParse(p['amount']?.toString() ?? '0')?.toStringAsFixed(2) ?? '0.00'} €',
+                              CurrencyUtils.formatEuro(double.tryParse(p['amount']?.toString() ?? '0') ?? 0),
                               style: TextStyle(
                                 color: isIN ? Colors.greenAccent : Colors.redAccent,
                                 fontSize: 16,

@@ -1,12 +1,13 @@
 import 'package:url_launcher/url_launcher.dart';
 import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:contabile_app/database/database_helper.dart';
-import 'package:contabile_app/providers/app_theme_provider.dart';
-import 'package:contabile_app/utils/date_utils_app.dart';
-import 'package:contabile_app/utils/security_utils.dart';
+import 'package:tax_flow_pro/database/database_helper.dart';
+import 'package:tax_flow_pro/providers/app_theme_provider.dart';
+import 'package:tax_flow_pro/utils/date_utils_app.dart';
+import 'package:tax_flow_pro/utils/security_utils.dart';
 import 'package:provider/provider.dart';
-import 'package:contabile_app/screens/payment_form_screen.dart';
+import 'package:tax_flow_pro/screens/payment_form_screen.dart';
+import '../utils/currency_utils.dart';
 
 class PaymentSummaryScreen extends StatefulWidget {
   final String paymentId;
@@ -175,7 +176,7 @@ class _PaymentSummaryScreenState extends State<PaymentSummaryScreen> {
                       const Divider(),
                       _buildInfoRow('Cliente', _customerName ?? '-'),
                       const Divider(),
-                      _buildInfoRow('Importo', '€ ${amount.toStringAsFixed(2)}', isAmount: true, isIN: isIN),
+                      _buildInfoRow('Importo', CurrencyUtils.formatEuro(amount), isAmount: true, isIN: isIN),
                       const Divider(),
                       _buildInfoRow('Metodo di Pagamento', _paymentData!['payment_method']?.toString() ?? '-'),
                       const Divider(),

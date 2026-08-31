@@ -3,7 +3,7 @@ $ErrorActionPreference = "Stop"
 
 $token = Get-Content -Path "C:\Users\Hp\Documents\Sviluppo\Token di accesso\token.txt" -Raw
 $token = $token.Trim()
-$repo = "BimboMixer-Releases/BimboMixer-Releases"
+$repo = "TaxFlowPro-Releases/TaxFlowPro-Releases"
 
 # Legge la versione automaticamente da pubspec.yaml
 $pubspecContent = Get-Content "pubspec.yaml" -Raw
@@ -16,7 +16,7 @@ if ($pubspecContent -match "version:\s*([\d.]+)\+") {
 
 $tag = "v$version"
 $releaseName = "Aggiornamento v$version"
-$body = "Nuovo aggiornamento v$version della Contabile App."
+$body = "Nuovo aggiornamento v$version della TaxFlowPro."
 
 Write-Host "=== Rilascio versione $version (SOLO UPLOAD) ===" -ForegroundColor Cyan
 
@@ -25,25 +25,25 @@ Write-Host "`n[3/4] Copia locale su Desktop..." -ForegroundColor Yellow
 
 # APK
 $apkSrcPath = "build\app\outputs\flutter-apk\app-release.apk"
-$apkDestDir = "C:\Users\Hp\Desktop\Contabile APP Bimbomixer"
-$apkDestPath = "$apkDestDir\BimboMixer_v$($version)_update.apk"
+$apkDestDir = "C:\Users\Hp\Desktop\TaxFlowPro"
+$apkDestPath = "$apkDestDir\TaxFlowPro_v$($version)_update.apk"
 Remove-Item "$apkDestDir\*" -Force -ErrorAction SilentlyContinue
 New-Item -ItemType Directory -Force -Path $apkDestDir | Out-Null
 Copy-Item $apkSrcPath $apkDestPath -Force
 Write-Host "APK copiato: $apkDestPath"
 
 # Portable ZIP
-$pcDestDir = "C:\Users\Hp\Desktop\Contabile APP Bimbomixer"
+$pcDestDir = "C:\Users\Hp\Desktop\TaxFlowPro"
 Remove-Item "$pcDestDir\*" -Force -ErrorAction SilentlyContinue
 New-Item -ItemType Directory -Force -Path $pcDestDir | Out-Null
 
 $winReleasePath = "build\windows\x64\runner\Release"
 
-$zipPath = "$pcDestDir\BimboMixer_v$($version)_portable.zip"
+$zipPath = "$pcDestDir\TaxFlowPro_v$($version)_portable.zip"
 Write-Host "  Creo portable ZIP da $winReleasePath..." -ForegroundColor DarkCyan
 
 $pcAssetPath = $zipPath
-$pcAssetName = "BimboMixer_v$($version)_portable.zip"
+$pcAssetName = "TaxFlowPro_v$($version)_portable.zip"
 $pcContentType = "application/zip"
 Write-Host "Portable ZIP creato: $zipPath"
 
@@ -94,7 +94,7 @@ if ($existingRelease) {
     }
 }
 
-Upload-Asset -FilePath $apkDestPath -FileName "BimboMixer_v$($version)_update.apk" -ContentType "application/vnd.android.package-archive"
+Upload-Asset -FilePath $apkDestPath -FileName "TaxFlowPro_v$($version)_update.apk" -ContentType "application/vnd.android.package-archive"
 
 
 Write-Host "`n✅ Tutto completato! Versione v$version pubblicata su GitHub." -ForegroundColor Green

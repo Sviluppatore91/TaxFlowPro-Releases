@@ -11,7 +11,7 @@ class ReportsScreen extends StatelessWidget {
       length: 2,
       child: Scaffold(
         appBar: AppBar(
-          title: const Text('Report & Consigli (TaxFlow Pro)'),
+          title: const Text('Report & Consigli (TaxFlowPro)'),
           bottom: const TabBar(
             tabs: [
               Tab(icon: Icon(Icons.bug_report), text: 'Bug Segnalati'),

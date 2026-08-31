@@ -63,7 +63,7 @@ class AdminUpdateScreen extends StatelessWidget {
                       SizedBox(height: 8),
                       Text(
                         '1. Crea un account su GitHub.com\n'
-                        '2. Crea un repository pubblico chiamato "BimboMixer-Releases"\n'
+                        '2. Crea un repository pubblico chiamato "TaxFlowPro-Releases"\n'
                         '3. Apri il file "lib/services/update_service.dart"\n'
                         '4. Modifica "TUO_USERNAME" con il tuo vero nome utente',
                         style: TextStyle(color: Colors.white.withOpacity(0.7)),

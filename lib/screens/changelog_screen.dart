@@ -105,7 +105,7 @@ class _ChangelogScreenState extends State<ChangelogScreen> {
                 Icon(Icons.info_outline, size: 64, color: theme.primaryColor),
                 SizedBox(height: 16),
                 Text(
-                  'Contabile App',
+                  'TaxFlowPro',
                   style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold),
                 ),
                 SizedBox(height: 8),

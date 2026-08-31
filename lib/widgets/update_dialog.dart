@@ -1,7 +1,8 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:contabile_app/services/update_service.dart';
+import 'package:tax_flow_pro/services/update_service.dart';
+import '../utils/currency_utils.dart';
 
 class UpdateDialog extends StatefulWidget {
   final Map<String, dynamic> updateData;
@@ -61,7 +62,7 @@ class _UpdateDialogState extends State<UpdateDialog> {
             setState(() {
               _progress = progress;
               _status =
-                  'Download: ${(progress * 100).toStringAsFixed(0)}% completato';
+                  'Download: ${CurrencyUtils.formatUI((progress * 100), decimals: 0)}% completato';
             });
           }
         },
@@ -213,7 +214,7 @@ class _UpdateDialogState extends State<UpdateDialog> {
               const SizedBox(height: 6),
               Text(
                 _progress > 0
-                    ? '${((_progress) * 100).toStringAsFixed(0)}%'
+                    ? '${CurrencyUtils.formatUI(((_progress) * 100), decimals: 0)}%'
                     : 'Connessione...',
                 style: const TextStyle(color: Colors.white38, fontSize: 12),
                 textAlign: TextAlign.center,

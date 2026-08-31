@@ -1,5 +1,5 @@
 $oldDir = 'C:\Users\Hp\Desktop\Nuove apk'
-$newDir = 'C:\Users\Hp\Desktop\CONTABILE APP'
+$newDir = 'C:\Users\Hp\Desktop\TaxFlowPro'
 
 if (-not (Test-Path $newDir)) {
     New-Item -ItemType Directory -Force -Path $newDir | Out-Null

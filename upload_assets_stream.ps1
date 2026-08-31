@@ -2,13 +2,13 @@ $ErrorActionPreference = "Stop"
 
 $token = Get-Content -Path "C:\Users\Hp\.github_token.txt" -Raw
 $token = $token.Trim()
-$repo = "BimboMixer-Releases/BimboMixer-Releases"
+$repo = "TaxFlowPro-Releases/TaxFlowPro-Releases"
 $version = "1.8.7"
 $releaseId = "366374819"
 
 # Local paths
-$apkDest = "C:\Users\Hp\Desktop\Contabile APP Bimbomixer\BimboMixer_v$($version)_update.apk"
-$zipDest = "C:\Users\Hp\Desktop\Contabile APP Bimbomixer\BimboMixer_v$($version)_update.zip"
+$apkDest = "C:\Users\Hp\Desktop\TaxFlowPro\TaxFlowPro_v$($version)_update.apk"
+$zipDest = "C:\Users\Hp\Desktop\TaxFlowPro\TaxFlowPro_v$($version)_update.zip"
 
 function Upload-Asset {
     param(
@@ -29,7 +29,7 @@ function Upload-Asset {
     Write-Host "`n$FileName uploaded successfully!"
 }
 
-Upload-Asset -FilePath $apkDest -FileName "BimboMixer_update.apk" -ContentType "application/vnd.android.package-archive"
-Upload-Asset -FilePath $zipDest -FileName "BimboMixer_PC_Portable.zip" -ContentType "application/zip"
+Upload-Asset -FilePath $apkDest -FileName "TaxFlowPro_update.apk" -ContentType "application/vnd.android.package-archive"
+Upload-Asset -FilePath $zipDest -FileName "TaxFlowPro_PC_Portable.zip" -ContentType "application/zip"
 
 Write-Host "Tutto completato! L'aggiornamento è stato pubblicato con successo."

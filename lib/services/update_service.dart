@@ -9,8 +9,8 @@ class UpdateService {
   final Dio _dio = Dio();
 
   // INSERISCI QUI IL TUO NOME UTENTE GITHUB
-  // Es: 'MarioRossi/BimboMixer-Releases'
-  static const String githubRepo = 'BimboMixer-Releases/BimboMixer-Releases';
+  // Es: 'MarioRossi/TaxFlowPro-Releases'
+  static const String githubRepo = 'TaxFlowPro-Releases/TaxFlowPro-Releases';
 
   int _versionToInt(String version) {
     String cleaned = version.replaceAll(RegExp(r'[^0-9.]'), '');
@@ -113,7 +113,7 @@ class UpdateService {
     Directory? downloadsDir = await getExternalStorageDirectory();
     downloadsDir ??= await getApplicationDocumentsDirectory();
 
-    final savePath = '${downloadsDir.path}/BimboMixer_update.apk';
+    final savePath = '${downloadsDir.path}/TaxFlowPro_update.apk';
 
     // Rimuovi versione precedente se esiste
     final file = File(savePath);
@@ -151,7 +151,7 @@ class UpdateService {
       } catch (e) {
         throw Exception(
             'Impossibile avviare l\'installazione: ${result.message}\n'
-            'Vai in Download e apri BimboMixer_update.apk manualmente.');
+            'Vai in Download e apri TaxFlowPro_update.apk manualmente.');
       }
     }
   }
@@ -166,7 +166,7 @@ class UpdateService {
     String ext = url.split('?').first.split('.').last.toLowerCase();
     if (ext != 'zip' && ext != 'exe' && ext != 'msix') ext = 'zip';
     
-    final savePath = '${downloadsDir.path}\\BimboMixer_update.$ext';
+    final savePath = '${downloadsDir.path}\\TaxFlowPro_update.$ext';
 
     final file = File(savePath);
     if (file.existsSync()) file.deleteSync();
@@ -198,7 +198,7 @@ class UpdateService {
       } catch (e) {
         throw Exception(
             'Impossibile avviare il file: ${result.message}\n'
-            'Vai in Download e apri BimboMixer_update.$ext manualmente.');
+            'Vai in Download e apri TaxFlowPro_update.$ext manualmente.');
       }
     }
   }

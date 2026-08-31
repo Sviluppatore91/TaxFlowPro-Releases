@@ -59,10 +59,45 @@ class CurrencyUtils {
     return roundMoney(parsed);
   }
 
+  /// Formats a double for UI display according to custom rules:
+  /// - Comma for decimals instead of dot.
+  /// - Dot for thousands separator ONLY if the number is > 9999.
+  /// Example: 1500.50 -> "1500,50"
+  /// Example: 10000.50 -> "10.000,50"
+  static String formatUI(num amount, {int decimals = 2}) {
+    double rounded = roundMoney(amount.toDouble());
+    bool isNegative = rounded < 0;
+    String str = rounded.abs().toStringAsFixed(decimals);
+    
+    List<String> parts = str.split('.');
+    String intPart = parts[0];
+    String decPart = parts.length > 1 ? parts[1] : '';
+    
+    // Add dot for thousands ONLY if intPart is longer than 4 digits (>= 10000)
+    if (intPart.length > 4) {
+      String formattedInt = '';
+      int count = 0;
+      for (int i = intPart.length - 1; i >= 0; i--) {
+        if (count > 0 && count % 3 == 0) {
+          formattedInt = '.' + formattedInt;
+        }
+        formattedInt = intPart[i] + formattedInt;
+        count++;
+      }
+      intPart = formattedInt;
+    }
+    
+    String result = decPart.isNotEmpty ? '$intPart,$decPart' : intPart;
+    if (isNegative) {
+      result = '-' + result;
+    }
+    return result;
+  }
+
   /// Formats a double into a standard Euro string representation.
-  /// Example: 1234.567 -> "€ 1.234,57"
-  static String formatEuro(double amount) {
-    return _euroFormat.format(amount);
+  /// Example: 1234.567 -> "€ 1234,57" (or with dots if >= 10000)
+  static String formatEuro(num amount) {
+    return '€ ${formatUI(amount)}';
   }
 
   /// Performs mathematical rounding to 2 decimal places to prevent floating-point accumulation errors.

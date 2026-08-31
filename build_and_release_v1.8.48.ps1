@@ -1,7 +1,21 @@
+$version = "1.8.48"
+$desktop = "$env:USERPROFILE\Desktop\TaxFlowPro"
+$apkName = "Contabile_TaxFlowPro_v$version.apk"
+$zipName = "Contabile_TaxFlowPro_Windows_v$version.zip"
+
+Write-Host "Building Windows..."
+flutter build windows
+Write-Host "Compressing Windows Build..."
+Compress-Archive -Path build\windows\x64\runner\Release\* -DestinationPath "$desktop\$zipName" -Force
+
+Write-Host "Building APK..."
+flutter build apk --release
+Write-Host "Copying APK..."
+Copy-Item "build\app\outputs\flutter-apk\app-release.apk" -Destination "$desktop\$apkName" -Force
+
 $token = Get-Content "C:\Users\Hp\Documents\Sviluppo\Token di accesso\token.txt" -Raw
 $token = $token.Trim()
 $repo = "TaxFlowPro-Releases/TaxFlowPro-Releases"
-$version = "1.8.24"
 
 $headers = @{
     "Authorization" = "token $token"
@@ -24,7 +38,7 @@ if ($null -eq $releaseResponse) {
     $body = @{
         "tag_name" = "v$version"
         "name" = "Release v$version"
-        "body" = "Risolti errori di caricamento e versione."
+        "body" = "Patch 1.8.47: Fix bug visivo sezione Preventivi Importati su Mobile/APK (spostato layout opzioni accettato/non accettato su riga orizzontale separata con scroll per evitare accavallamenti)."
     } | ConvertTo-Json
 
     try {
@@ -38,22 +52,35 @@ if ($null -eq $releaseResponse) {
 }
 
 $uploadUrl = $releaseResponse.upload_url.Split('{')[0]
-Write-Host "Uploading APK..."
 
 # Upload APK
-$apkPath = "C:\Users\Hp\Documents\Sviluppo\contabile\tax_flow_pro\build\app\outputs\flutter-apk\app-release.apk"
-$apkName = "tax_flow_pro.apk"
 $apkUploadUrl = $uploadUrl + "?name=" + $apkName
-
-$uploadHeaders = @{
+$uploadHeadersApk = @{
     "Authorization" = "token $token"
     "Content-Type" = "application/vnd.android.package-archive"
 }
 
+Write-Host "Uploading APK..."
 try {
-    Invoke-RestMethod -Uri $apkUploadUrl -Method Post -Headers $uploadHeaders -InFile $apkPath
+    Invoke-RestMethod -Uri $apkUploadUrl -Method Post -Headers $uploadHeadersApk -InFile "$desktop\$apkName"
     Write-Host "APK uploaded successfully."
 } catch {
     Write-Host "Failed to upload APK. Error:"
+    Write-Host $_.Exception.Message
+}
+
+# Upload ZIP
+$zipUploadUrl = $uploadUrl + "?name=" + $zipName
+$uploadHeadersZip = @{
+    "Authorization" = "token $token"
+    "Content-Type" = "application/zip"
+}
+
+Write-Host "Uploading ZIP..."
+try {
+    Invoke-RestMethod -Uri $zipUploadUrl -Method Post -Headers $uploadHeadersZip -InFile "$desktop\$zipName"
+    Write-Host "ZIP uploaded successfully."
+} catch {
+    Write-Host "Failed to upload ZIP. Error:"
     Write-Host $_.Exception.Message
 }

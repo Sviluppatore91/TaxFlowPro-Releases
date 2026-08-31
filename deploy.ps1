@@ -8,7 +8,7 @@ New-Item -ItemType Directory -Force -Path $pcDir
 # Copy APK
 $apkSource = "build\app\outputs\flutter-apk\app-release.apk"
 if (Test-Path $apkSource) {
-    Copy-Item -Path $apkSource -Destination "$androidDir\contabile_app.apk" -Force
+    Copy-Item -Path $apkSource -Destination "$androidDir\tax_flow_pro.apk" -Force
     Write-Host "APK copiato con successo."
 } else {
     Write-Host "APK non trovato."

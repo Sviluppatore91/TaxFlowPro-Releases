@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:audioplayers/audioplayers.dart';
 import '../services/update_service.dart';
+import '../utils/currency_utils.dart';
 
 class ClientUpdateScreen extends StatefulWidget {
   final Map<String, dynamic> updateData;
@@ -103,7 +104,7 @@ class _ClientUpdateScreenState extends State<ClientUpdateScreen> {
               if (_isDownloading) ...[
                 LinearProgressIndicator(value: _progress),
                 SizedBox(height: 16),
-                Text("${(_progress * 100).toStringAsFixed(1)}%"),
+                Text("${CurrencyUtils.formatUI((_progress * 100), decimals: 1)}%"),
                 SizedBox(height: 8),
                 Text(_statusMessage, style: TextStyle(color: Colors.grey)),
               ] else ...[

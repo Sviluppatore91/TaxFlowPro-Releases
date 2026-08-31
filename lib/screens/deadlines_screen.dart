@@ -11,6 +11,7 @@ import '../services/pdf_report_service.dart';
 import '../utils/report_utils.dart';
 import '../utils/security_utils.dart';
 import 'calendar_screen.dart';
+import '../utils/currency_utils.dart';
 import 'package:pdf/widgets.dart' as pw;
 
 class DeadlinesScreen extends StatefulWidget {
@@ -112,7 +113,7 @@ class _DeadlinesScreenState extends State<DeadlinesScreen> {
     final notes = d['notes'] as String? ?? '';
     final amount = (d['amount'] as num?)?.toDouble() ?? 0.0;
     final description =
-        '${notes.isNotEmpty ? '$notes\n' : ''}Importo: €${amount.toStringAsFixed(2)}';
+        '${notes.isNotEmpty ? '$notes\n' : ''}Importo: €${CurrencyUtils.formatUI(amount, decimals: 2)}';
 
     DateTime startDate;
     DateTime endDate;
@@ -689,7 +690,7 @@ class _DeadlinesScreenState extends State<DeadlinesScreen> {
                 final date = _buildDateLabel(d, dateFormat);
                 final title = d['title']?.toString() ?? '';
                 final amountStr = d['amount']?.toString() ?? '0.0';
-                final amount = '${double.tryParse(amountStr)?.toStringAsFixed(2) ?? '0.00'} €';
+                final amount = CurrencyUtils.formatEuro(CurrencyUtils.parseCurrency(amountStr));
                 final status = d['status'] == 'PAID' ? 'Pagato' : 'Pend.';
                 return [title, date, amount, status];
               }).toList();
@@ -793,7 +794,7 @@ class _DeadlinesScreenState extends State<DeadlinesScreen> {
                     style: TextStyle(
                         color: color.withValues(alpha: 0.8), fontSize: 11)),
                 Text(
-                  '€ ${amount.toStringAsFixed(2)}',
+                  CurrencyUtils.formatEuro(amount),
                   style: TextStyle(
                     color: color,
                     fontSize: 16,
@@ -935,7 +936,7 @@ class _DeadlinesScreenState extends State<DeadlinesScreen> {
                       children: [
                         if (amount > 0)
                           Text(
-                            '€ ${amount.toStringAsFixed(2)}',
+                            CurrencyUtils.formatEuro(amount),
                             style: TextStyle(
                               color: isPaid ? Colors.greenAccent : Colors.white,
                               fontWeight: FontWeight.bold,
