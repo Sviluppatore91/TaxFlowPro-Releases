@@ -27,13 +27,20 @@ class _MemoEventsScreenState extends State<MemoEventsScreen> {
 
   Future<void> _loadData() async {
     setState(() => _isLoading = true);
-    final memoEvents = await _dbHelper.getMemoEvents();
-    final customers = await _dbHelper.getCustomers();
-    setState(() {
-      _memoEvents = memoEvents;
-      _customers = customers;
-      _isLoading = false;
-    });
+    try {
+      final memoEvents = await _dbHelper.getMemoEvents();
+      final customers = await _dbHelper.getCustomers();
+      if (mounted) {
+        setState(() {
+          _memoEvents = memoEvents;
+          _customers = customers;
+        });
+      }
+    } catch (e) {
+      debugPrint('Error loading memo events: $e');
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
+    }
   }
 
   Future<void> _transferToActual(Map<String, dynamic> memo) async {

@@ -54,11 +54,20 @@ class _CustomersScreenState extends State<CustomersScreen> {
 
   Future<void> _refreshCustomers() async {
     setState(() => _isLoading = true);
-    final data = await _dbHelper.getCustomers();
-    setState(() {
-      _customers = data.map((e) => Customer.fromMap(e)).toList();
-      _isLoading = false;
-    });
+    try {
+      final data = await _dbHelper.getCustomers();
+      if (mounted) {
+        setState(() {
+          _customers = data.map((e) => Customer.fromMap(e)).toList();
+        });
+      }
+    } catch (e) {
+      debugPrint('Error loading customers: $e');
+    } finally {
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
+    }
 
     if (_selectedCustomer != null) {
       // Aggiorna il cliente selezionato se modificato

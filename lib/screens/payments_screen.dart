@@ -31,11 +31,18 @@ class _PaymentsScreenState extends State<PaymentsScreen> {
 
   Future<void> _loadPayments() async {
     setState(() => _isLoading = true);
-    final payments = await _dbHelper.getPayments();
-    setState(() {
-      _payments = payments;
-      _isLoading = false;
-    });
+    try {
+      final payments = await _dbHelper.getPayments();
+      if (mounted) {
+        setState(() {
+          _payments = payments;
+        });
+      }
+    } catch (e) {
+      debugPrint('Error loading payments: $e');
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
+    }
   }
 
   Future<void> _deletePayment(String id) async {

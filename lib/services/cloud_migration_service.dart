@@ -50,17 +50,21 @@ class CloudMigrationService {
           final values = filteredData.values.toList();
           
           try {
-            await db.execute(
-              'INSERT OR REPLACE INTO $collection ($columns) VALUES ($placeholders)',
-              values,
+            await db.insert(
+              collection,
+              filteredData,
+              conflictAlgorithm: ConflictAlgorithm.replace,
             );
           } catch (e) {
             debugPrint('Error inserting into $collection (doc ${doc.id}): $e');
+            throw Exception('Errore salvataggio record $collection: $e');
           }
         }
         debugPrint('Synced $collection: ${snapshot.docs.length} items');
       } catch (e) {
         debugPrint('Error syncing $collection: $e');
+        // Non bloccare tutto se una tabella fallisce, ma segnalalo
+        throw Exception('Errore sync tabella $collection: $e');
       }
     }
   }

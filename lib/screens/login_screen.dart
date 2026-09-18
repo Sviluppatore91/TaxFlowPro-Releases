@@ -234,10 +234,19 @@ class _LoginScreenState extends State<LoginScreen> {
     try {
       final dbHelper = DatabaseHelper();
       
-      // Usa verifyCredentials per confronto sicuro
       final verifiedUser = await dbHelper.verifyCredentials(username, password);
 
       if (verifiedUser != null) {
+        // Log into Firebase to enable Cloud Migration (if needed)
+        try {
+          await FirebaseAuth.instance.signInWithEmailAndPassword(
+            email: username,
+            password: password,
+          );
+        } catch (fbError) {
+          debugPrint('Firebase login warning: $fbError');
+        }
+
         final role = verifiedUser['role'] ?? 'User';
         
         dbHelper.cleanOldLoginAttempts();

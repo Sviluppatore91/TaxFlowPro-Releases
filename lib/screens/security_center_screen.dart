@@ -26,13 +26,20 @@ class _SecurityCenterScreenState extends State<SecurityCenterScreen> with Single
 
   Future<void> _loadData() async {
     setState(() => _isLoading = true);
-    final access = await _dbHelper.getAccessLogs();
-    final audit = await _dbHelper.getAuditLogs(limit: 200);
-    setState(() {
-      _accessLogs = access;
-      _auditLogs = audit;
-      _isLoading = false;
-    });
+    try {
+      final access = await _dbHelper.getAccessLogs();
+      final audit = await _dbHelper.getAuditLogs(limit: 200);
+      if (mounted) {
+        setState(() {
+          _accessLogs = access;
+          _auditLogs = audit;
+        });
+      }
+    } catch (e) {
+      debugPrint('Error loading security data: $e');
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
+    }
   }
 
   Color _getSeverityColor(String severity) {

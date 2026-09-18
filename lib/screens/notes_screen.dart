@@ -25,11 +25,18 @@ class _NotesScreenState extends State<NotesScreen> {
 
   Future<void> _loadNotes() async {
     setState(() => _isLoading = true);
-    final notes = await _dbHelper.getNotes();
-    setState(() {
-      _notes = notes;
-      _isLoading = false;
-    });
+    try {
+      final notes = await _dbHelper.getNotes();
+      if (mounted) {
+        setState(() {
+          _notes = notes;
+        });
+      }
+    } catch (e) {
+      debugPrint('Error loading notes: $e');
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
+    }
   }
 
   Future<void> _deleteNote(String id) async {

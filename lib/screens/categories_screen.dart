@@ -24,11 +24,20 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
 
   Future<void> _refreshCategories() async {
     setState(() => _isLoading = true);
-    final data = await _dbHelper.getCategories();
-    setState(() {
-      _categories = data.map((e) => Category.fromMap(e)).toList();
-      _isLoading = false;
-    });
+    try {
+      final data = await _dbHelper.getCategories();
+      if (mounted) {
+        setState(() {
+          _categories = data.map((e) => Category.fromMap(e)).toList();
+        });
+      }
+    } catch (e) {
+      debugPrint('Error loading categories: $e');
+    } finally {
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
+    }
   }
 
   void _showCategoryDialog([Category? category]) {

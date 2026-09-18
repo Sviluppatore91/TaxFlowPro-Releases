@@ -32,12 +32,21 @@ class _CalendarScreenState extends State<CalendarScreen> {
   }
 
   Future<void> _loadEvents() async {
-    final events = await _dbHelper.getCalendarEvents();
-    setState(() {
-      _events = events;
-      _isLoading = false;
-      _applyFilter();
-    });
+    try {
+      final events = await _dbHelper.getCalendarEvents();
+      if (mounted) {
+        setState(() {
+          _events = events;
+          _applyFilter();
+        });
+      }
+    } catch (e) {
+      debugPrint('Error loading events: $e');
+    } finally {
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
+    }
   }
 
   void _applyFilter() {

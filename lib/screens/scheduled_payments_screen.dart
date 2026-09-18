@@ -31,11 +31,18 @@ class _ScheduledPaymentsScreenState extends State<ScheduledPaymentsScreen> {
 
   Future<void> _loadScheduledPayments() async {
     setState(() => _isLoading = true);
-    final payments = await _dbHelper.getScheduledPayments();
-    setState(() {
-      _payments = payments;
-      _isLoading = false;
-    });
+    try {
+      final payments = await _dbHelper.getScheduledPayments();
+      if (mounted) {
+        setState(() {
+          _payments = payments;
+        });
+      }
+    } catch (e) {
+      debugPrint('Error loading scheduled payments: $e');
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
+    }
   }
 
   void _deleteScheduledPayment(String id) {

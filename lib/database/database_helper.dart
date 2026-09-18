@@ -32,24 +32,70 @@ class DatabaseHelper {
     String path = await getDatabasePath();
     return await openDatabase(
       path,
-      version: 2,
+      version: 3,
       onCreate: _onCreate,
       onUpgrade: _onUpgrade,
     );
   }
 
+  Future<void> _addColumnIfNotExists(Database db, String table, String column, String type) async {
+    final info = await db.rawQuery("PRAGMA table_info($table)");
+    final existingColumns = info.map((c) => c['name'] as String).toSet();
+    if (!existingColumns.contains(column)) {
+      await db.execute('ALTER TABLE $table ADD COLUMN $column $type');
+    }
+  }
+
   Future<void> _onUpgrade(Database db, int oldVersion, int newVersion) async {
     if (oldVersion < 2) {
-      // Add missing columns to users table for databases created with v1
-      final usersInfo = await db.rawQuery("PRAGMA table_info(users)");
-      final existingColumns = usersInfo.map((c) => c['name'] as String).toSet();
-
-      if (!existingColumns.contains('email')) {
-        await db.execute('ALTER TABLE users ADD COLUMN email TEXT');
-      }
-      if (!existingColumns.contains('phone')) {
-        await db.execute('ALTER TABLE users ADD COLUMN phone TEXT');
-      }
+      await _addColumnIfNotExists(db, 'users', 'email', 'TEXT');
+      await _addColumnIfNotExists(db, 'users', 'phone', 'TEXT');
+    }
+    if (oldVersion < 3) {
+      // customers
+      await _addColumnIfNotExists(db, 'customers', 'sdi_code', 'TEXT');
+      await _addColumnIfNotExists(db, 'customers', 'tax_code', 'TEXT');
+      await _addColumnIfNotExists(db, 'customers', 'address_street', 'TEXT');
+      await _addColumnIfNotExists(db, 'customers', 'address_zip', 'TEXT');
+      await _addColumnIfNotExists(db, 'customers', 'address_city', 'TEXT');
+      await _addColumnIfNotExists(db, 'customers', 'address_province', 'TEXT');
+      await _addColumnIfNotExists(db, 'customers', 'pec', 'TEXT');
+      await _addColumnIfNotExists(db, 'customers', 'contacts', 'TEXT');
+      await _addColumnIfNotExists(db, 'customers', 'cig', 'TEXT');
+      await _addColumnIfNotExists(db, 'customers', 'cup', 'TEXT');
+      await _addColumnIfNotExists(db, 'customers', 'pa_reference', 'TEXT');
+      await _addColumnIfNotExists(db, 'customers', 'pa_contract', 'TEXT');
+      await _addColumnIfNotExists(db, 'customers', 'logo_path', 'TEXT');
+      
+      // categories
+      await _addColumnIfNotExists(db, 'categories', 'type', 'TEXT');
+      await _addColumnIfNotExists(db, 'categories', 'color_hex', 'TEXT');
+      
+      // service_types
+      await _addColumnIfNotExists(db, 'service_types', 'color_hex', 'TEXT');
+      
+      // payments
+      await _addColumnIfNotExists(db, 'payments', 'type', 'TEXT');
+      await _addColumnIfNotExists(db, 'payments', 'category_id', 'TEXT');
+      await _addColumnIfNotExists(db, 'payments', 'attachments', 'TEXT');
+      await _addColumnIfNotExists(db, 'payments', 'status', 'TEXT');
+      await _addColumnIfNotExists(db, 'payments', 'event_dates', 'TEXT');
+      await _addColumnIfNotExists(db, 'payments', 'date_to', 'TEXT');
+      await _addColumnIfNotExists(db, 'payments', 'title', 'TEXT');
+      await _addColumnIfNotExists(db, 'payments', 'client_phone', 'TEXT');
+      await _addColumnIfNotExists(db, 'payments', 'client_email', 'TEXT');
+      
+      // invoices
+      await _addColumnIfNotExists(db, 'invoices', 'number', 'TEXT');
+      await _addColumnIfNotExists(db, 'invoices', 'notes', 'TEXT');
+      await _addColumnIfNotExists(db, 'invoices', 'event_date', 'TEXT');
+      await _addColumnIfNotExists(db, 'invoices', 'vat_code', 'TEXT');
+      
+      // deadlines
+      await _addColumnIfNotExists(db, 'deadlines', 'amount', 'REAL');
+      await _addColumnIfNotExists(db, 'deadlines', 'title', 'TEXT');
+      await _addColumnIfNotExists(db, 'deadlines', 'category_id', 'TEXT');
+      await _addColumnIfNotExists(db, 'deadlines', 'status', 'TEXT');
     }
   }
   
@@ -64,12 +110,12 @@ class DatabaseHelper {
   Future<void> _onCreate(Database db, int version) async {
     await db.execute('''CREATE TABLE users (id TEXT PRIMARY KEY, username TEXT, email TEXT, role TEXT, password_hash TEXT, phone TEXT)''');
     await db.execute('''CREATE TABLE login_attempts (id TEXT PRIMARY KEY, username TEXT, timestamp TEXT, type TEXT)''');
-    await db.execute('''CREATE TABLE customers (id TEXT PRIMARY KEY, name TEXT, email TEXT, phone TEXT, address TEXT, vat_number TEXT, fiscal_code TEXT, notes TEXT)''');
-    await db.execute('''CREATE TABLE categories (id TEXT PRIMARY KEY, name TEXT)''');
-    await db.execute('''CREATE TABLE service_types (id TEXT PRIMARY KEY, name TEXT, category_id TEXT, price REAL)''');
-    await db.execute('''CREATE TABLE payments (id TEXT PRIMARY KEY, customer_id TEXT, service_id TEXT, amount REAL, date TEXT, payment_method TEXT, notes TEXT, is_recurring INTEGER, recurrence_type TEXT)''');
-    await db.execute('''CREATE TABLE invoices (id TEXT PRIMARY KEY, customer_id TEXT, amount REAL, date TEXT, status TEXT)''');
-    await db.execute('''CREATE TABLE deadlines (id TEXT PRIMARY KEY, date TEXT, description TEXT)''');
+    await db.execute('''CREATE TABLE customers (id TEXT PRIMARY KEY, name TEXT, email TEXT, phone TEXT, address TEXT, vat_number TEXT, fiscal_code TEXT, notes TEXT, sdi_code TEXT, tax_code TEXT, address_street TEXT, address_zip TEXT, address_city TEXT, address_province TEXT, pec TEXT, contacts TEXT, cig TEXT, cup TEXT, pa_reference TEXT, pa_contract TEXT, logo_path TEXT)''');
+    await db.execute('''CREATE TABLE categories (id TEXT PRIMARY KEY, name TEXT, type TEXT, color_hex TEXT)''');
+    await db.execute('''CREATE TABLE service_types (id TEXT PRIMARY KEY, name TEXT, category_id TEXT, price REAL, color_hex TEXT)''');
+    await db.execute('''CREATE TABLE payments (id TEXT PRIMARY KEY, customer_id TEXT, service_id TEXT, amount REAL, date TEXT, payment_method TEXT, notes TEXT, is_recurring INTEGER, recurrence_type TEXT, type TEXT, category_id TEXT, attachments TEXT, status TEXT, event_dates TEXT, date_to TEXT, title TEXT, client_phone TEXT, client_email TEXT)''');
+    await db.execute('''CREATE TABLE invoices (id TEXT PRIMARY KEY, customer_id TEXT, amount REAL, date TEXT, status TEXT, number TEXT, notes TEXT, event_date TEXT, vat_code TEXT)''');
+    await db.execute('''CREATE TABLE deadlines (id TEXT PRIMARY KEY, date TEXT, description TEXT, amount REAL, title TEXT, category_id TEXT, status TEXT)''');
     await db.execute('''CREATE TABLE access_logs (id TEXT PRIMARY KEY, username TEXT, role TEXT, device_type TEXT, timestamp TEXT, event_type TEXT)''');
     await db.execute('''CREATE TABLE audit_log (id TEXT PRIMARY KEY, username TEXT, event_type TEXT, severity TEXT, description TEXT, target_id TEXT, target_collection TEXT, timestamp TEXT)''');
     await db.execute('''CREATE TABLE calendar_events (id TEXT PRIMARY KEY, date TEXT, title TEXT, description TEXT)''');

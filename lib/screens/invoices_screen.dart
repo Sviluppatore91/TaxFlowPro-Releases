@@ -50,8 +50,9 @@ class _InvoicesScreenState extends State<InvoicesScreen> {
 
   Future<void> _loadData() async {
     setState(() => _isLoading = true);
-    final invoices = await _dbHelper.getInvoices();
-    final customers = await _dbHelper.getCustomers();
+    try {
+      final invoices = await _dbHelper.getInvoices();
+      final customers = await _dbHelper.getCustomers();
 
     invoices.sort((a, b) {
       // Prioritize status: LATE > PENDING > PAID
@@ -72,11 +73,17 @@ class _InvoicesScreenState extends State<InvoicesScreen> {
       return numA.compareTo(numB);
     });
 
-    setState(() {
-      _invoices = invoices;
-      _customers = customers;
-      _isLoading = false;
-    });
+      if (mounted) {
+        setState(() {
+          _invoices = invoices;
+          _customers = customers;
+        });
+      }
+    } catch (e) {
+      debugPrint('Error loading invoices: $e');
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
+    }
   }
 
   Future<void> _launchUrl(String urlString) async {

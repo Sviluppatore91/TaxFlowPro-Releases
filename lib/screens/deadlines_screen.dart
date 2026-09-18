@@ -32,11 +32,20 @@ class _DeadlinesScreenState extends State<DeadlinesScreen> {
 
   Future<void> _loadDeadlines() async {
     setState(() => _isLoading = true);
-    final deadlines = await _dbHelper.getDeadlines();
-    setState(() {
-      _deadlines = deadlines;
-      _isLoading = false;
-    });
+    try {
+      final deadlines = await _dbHelper.getDeadlines();
+      if (mounted) {
+        setState(() {
+          _deadlines = deadlines;
+        });
+      }
+    } catch (e) {
+      debugPrint('Error loading deadlines: $e');
+    } finally {
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
+    }
   }
 
   Future<void> _launchUrl(String urlString) async {

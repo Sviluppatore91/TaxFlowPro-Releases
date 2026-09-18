@@ -33,8 +33,9 @@ class _InvoiceSummaryScreenState extends State<InvoiceSummaryScreen> {
   Future<void> _loadData() async {
     setState(() => _isLoading = true);
     
-    final pData = widget.invoice;
-    final custId = pData['customer_id'];
+    try {
+      final pData = widget.invoice;
+      final custId = pData['customer_id'];
     if (custId != null) {
       final custList = await _dbHelper.getCustomers();
       final c = custList.cast<Map<String,dynamic>>().firstWhere(
@@ -51,10 +52,13 @@ class _InvoiceSummaryScreenState extends State<InvoiceSummaryScreen> {
         } else if (pData['attachments'] is List) {
           _attachments = List<String>.from(pData['attachments']);
         }
-      } catch (_) {}
+        } catch (_) {}
+      }
+    } catch (e) {
+      debugPrint('Error loading data: $e');
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
     }
-    
-    setState(() => _isLoading = false);
   }
 
   @override

@@ -12,6 +12,8 @@ import '../widgets/dashboard_pie_chart.dart';
 import '../widgets/recent_activity_sidebar.dart';
 import '../widgets/pending_tasks_sidebar.dart';
 import '../widgets/glass_container.dart';
+import '../services/update_service.dart';
+import '../widgets/update_dialog.dart';
 
 class DashboardScreen extends StatefulWidget {
   final String role;
@@ -61,6 +63,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
       final deadlines = await _dbHelper.getDeadlines();
       final invoices = await _dbHelper.getInvoices();
+
+      // Controllo aggiornamenti automatico in background
+      _checkForUpdates();
 
       final categories = await _dbHelper.getCategories();
       Map<String, String> categoryNames = {};
@@ -134,15 +139,34 @@ class _DashboardScreenState extends State<DashboardScreen> {
         _serviceNames = serviceNames;
         _categoryColors = tempColors;
         _totalDeadlinesPaid = metrics.totalDeadlinesPaid;
-        _isLoading = false;
       });
     } catch (e) {
       debugPrint('Error loading dashboard data: $e');
+    } finally {
       if (mounted) {
         setState(() {
           _isLoading = false;
         });
       }
+    }
+  }
+
+  Future<void> _checkForUpdates() async {
+    try {
+      final updateService = UpdateService();
+      final updateData = await updateService.checkForUpdate();
+      if (updateData != null && mounted) {
+        showDialog(
+          context: context,
+          barrierDismissible: false,
+          builder: (ctx) => UpdateDialog(
+            updateData: updateData,
+            updateService: updateService,
+          ),
+        );
+      }
+    } catch (e) {
+      debugPrint("Errore durante il controllo aggiornamenti: $e");
     }
   }
 

@@ -24,11 +24,18 @@ class _ServicesScreenState extends State<ServicesScreen> {
 
   Future<void> _refreshServices() async {
     setState(() => _isLoading = true);
-    final data = await _dbHelper.getServiceTypes();
-    setState(() {
-      _services = data.map((e) => ServiceType.fromMap(e)).toList();
-      _isLoading = false;
-    });
+    try {
+      final data = await _dbHelper.getServiceTypes();
+      if (mounted) {
+        setState(() {
+          _services = data.map((e) => ServiceType.fromMap(e)).toList();
+        });
+      }
+    } catch (e) {
+      debugPrint('Error loading services: $e');
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
+    }
   }
 
   void _showServiceDialog([ServiceType? service]) {

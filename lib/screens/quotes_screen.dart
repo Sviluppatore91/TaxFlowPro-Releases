@@ -35,16 +35,16 @@ class _QuotesScreenState extends State<QuotesScreen> {
       if (mounted) {
         setState(() {
           _quotes = q;
-          _isLoading = false;
         });
       }
     } catch (e) {
       if (mounted) {
-        setState(() => _isLoading = false);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Errore caricamento preventivi: $e'), backgroundColor: Colors.red),
         );
       }
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
     }
   }
 

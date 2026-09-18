@@ -23,11 +23,18 @@ class _UsersScreenState extends State<UsersScreen> {
 
   Future<void> _loadUsers() async {
     setState(() => _isLoading = true);
-    final users = await _dbHelper.getUsers();
-    setState(() {
-      _users = users;
-      _isLoading = false;
-    });
+    try {
+      final users = await _dbHelper.getUsers();
+      if (mounted) {
+        setState(() {
+          _users = users;
+        });
+      }
+    } catch (e) {
+      debugPrint('Error loading users: $e');
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
+    }
   }
 
   void _showUserDialog({Map<String, dynamic>? user}) {
