@@ -1,6 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tax_flow_pro/utils/currency_utils.dart';
-import 'package:intl/intl.dart';
 
 void main() {
   group('CurrencyUtils.parseCurrency', () {

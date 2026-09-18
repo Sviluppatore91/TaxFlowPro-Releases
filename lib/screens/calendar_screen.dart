@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import '../database/database_helper.dart';
-import '../utils/date_utils_app.dart';
 import '../utils/security_utils.dart';
 import 'package:intl/intl.dart';
 import '../providers/app_theme_provider.dart';
+import '../widgets/calendar_grid.dart';
+import '../widgets/daily_overview.dart';
 import 'package:provider/provider.dart';
 
 class CalendarScreen extends StatefulWidget {
@@ -18,8 +19,11 @@ class _CalendarScreenState extends State<CalendarScreen> {
   final DatabaseHelper _dbHelper = DatabaseHelper();
   List<Map<String, dynamic>> _events = [];
   List<Map<String, dynamic>> _filteredEvents = [];
+  Map<DateTime, List<Map<String, dynamic>>> _eventsMap = {};
+  DateTime _selectedDate = DateTime.now();
+  final DateTime _currentMonth = DateTime.now();
   bool _isLoading = true;
-  String _searchQuery = '';
+  final String _searchQuery = '';
 
   @override
   void initState() {
@@ -44,6 +48,24 @@ class _CalendarScreenState extends State<CalendarScreen> {
         final title = (e['title'] ?? '').toString().toLowerCase();
         return title.contains(_searchQuery.toLowerCase());
       }).toList();
+    }
+    
+    // Build events map
+    _eventsMap = {};
+    for (var event in _filteredEvents) {
+      if (event['date'] != null) {
+        try {
+          final date = DateTime.parse(event['date']);
+          final dayDate = DateTime(date.year, date.month, date.day);
+          
+          if (_eventsMap[dayDate] == null) {
+            _eventsMap[dayDate] = [];
+          }
+          // Assign dummy color based on length for mockup
+          event['color'] = _eventsMap[dayDate]!.length % 2 == 0 ? const Color(0xFF06B6D4) : const Color(0xFFE11D48);
+          _eventsMap[dayDate]!.add(event);
+        } catch (_) {}
+      }
     }
   }
 
@@ -167,108 +189,103 @@ class _CalendarScreenState extends State<CalendarScreen> {
   @override
   Widget build(BuildContext context) {
     final themeProvider = Provider.of<AppThemeProvider>(context);
+    final monthStr = DateFormat('MMMM yyyy').format(_currentMonth);
+    
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Calendario Eventi'),
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        flexibleSpace: Container(
-          decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              colors: [Color(0xFF2C3E50), Color(0xFF4CA1AF)],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
-          ),
-        ),
-      ),
+      backgroundColor: Colors.transparent,
       body: _isLoading
           ? Center(child: CircularProgressIndicator())
           : Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
+                // Header
                 Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: TextField(
-                    decoration: InputDecoration(
-                      hintText: 'Cerca evento...',
-                      prefixIcon: Icon(Icons.search),
-                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-                    ),
-                    onChanged: (val) {
-                      setState(() {
-                        _searchQuery = val;
-                        _applyFilter();
-                      });
-                    },
+                  padding: const EdgeInsets.fromLTRB(24, 24, 24, 16),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Expanded(
+                        child: Text(
+                          'TAX & ACCOUNTING | $monthStr',
+                          style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                      Row(
+                        children: [
+                          CircleAvatar(
+                            radius: 12,
+                            backgroundImage: AssetImage('assets/images/avatar_mock.jpg'),
+                            backgroundColor: Colors.grey,
+                          ),
+                          const SizedBox(width: -8),
+                          CircleAvatar(
+                            radius: 12,
+                            backgroundImage: AssetImage('assets/images/avatar_mock2.jpg'),
+                            backgroundColor: Colors.blueGrey,
+                          ),
+                          const SizedBox(width: 16),
+                          Icon(Icons.search, color: Colors.white.withValues(alpha: 0.5), size: 20),
+                          const SizedBox(width: 12),
+                          Icon(Icons.settings, color: Colors.white.withValues(alpha: 0.5), size: 20),
+                        ],
+                      ),
+                    ],
                   ),
                 ),
+                
+                // Calendar Grid
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                  child: CalendarGrid(
+                    currentMonth: _currentMonth,
+                    selectedDate: _selectedDate,
+                    onDateSelected: (date) {
+                      setState(() {
+                        _selectedDate = date;
+                      });
+                    },
+                    events: _eventsMap,
+                  ),
+                ),
+                
+                const SizedBox(height: 16),
+                
+                // Daily Overview
                 Expanded(
-                  child: _filteredEvents.isEmpty
-                      ? Center(child: Text("Nessun evento trovato."))
-                      : ListView.builder(
-                          itemCount: _filteredEvents.length,
-                          itemBuilder: (context, index) {
-                            final event = _filteredEvents[index];
-                            bool isCompleted = event['is_completed'] == 1 || event['is_completed'] == true;
-                            bool isPaid = event['is_paid'] == 1 || event['is_paid'] == true;
-
-                            return Card(
-                              margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                              child: ListTile(
-                                title: Text(event['title'] ?? '', style: TextStyle(fontWeight: FontWeight.bold)),
-                                subtitle: Text(DateUtilsApp.formatDbDate(event['date'], themeProvider.dateFormat)),
-                                trailing: Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Column(
-                                      mainAxisAlignment: MainAxisAlignment.center,
-                                      children: [
-                                        Text('Completato', style: TextStyle(fontSize: 10)),
-                                        SizedBox(
-                                          height: 24,
-                                          child: Checkbox(
-                                            value: isCompleted,
-                                            onChanged: (v) => _toggleStatus(event, 'is_completed', v ?? false),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                    SizedBox(width: 8),
-                                    Column(
-                                      mainAxisAlignment: MainAxisAlignment.center,
-                                      children: [
-                                        Text('Pagato', style: TextStyle(fontSize: 10)),
-                                        SizedBox(
-                                          height: 24,
-                                          child: Checkbox(
-                                            value: isPaid,
-                                            onChanged: (v) => _toggleStatus(event, 'is_paid', v ?? false),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                    IconButton(
-                                      icon: Icon(Icons.edit, color: Colors.blue),
-                                      onPressed: () => _showEventDialog(event),
-                                    ),
-                                    IconButton(
-                                      icon: Icon(Icons.delete, color: Colors.red),
-                                      onPressed: () => _deleteEvent(event['id']),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            );
-                          },
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        // Selected Date label Box
+                        Container(
+                          width: 100,
+                          decoration: BoxDecoration(
+                            color: Colors.white.withValues(alpha: 0.05),
+                            borderRadius: BorderRadius.circular(16),
+                            border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
+                          ),
+                          padding: const EdgeInsets.all(12),
+                          child: Text(
+                            DateFormat('E, MMM dd').format(_selectedDate),
+                            style: const TextStyle(color: Colors.white, fontSize: 14),
+                          ),
                         ),
+                        const SizedBox(width: 12),
+                        // Overview list
+                        Expanded(
+                          child: DailyOverview(
+                            date: _selectedDate,
+                            events: _eventsMap[DateTime(_selectedDate.year, _selectedDate.month, _selectedDate.day)] ?? [],
+                            onAddEvent: () => _showEventDialog(),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
               ],
             ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => _showEventDialog(),
-        backgroundColor: Colors.blueAccent,
-        child: Icon(Icons.add),
-      ),
     );
   }
 }

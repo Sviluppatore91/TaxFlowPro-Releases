@@ -1,4 +1,3 @@
-# BimboMixer Contabilit‡ (Contabile App)
-
-Applicazione contabile multipiattaforma (Android, Windows).
+# TaxFlowPro (Contabile App)
+App per la gestione della contabilit√†.
 Repository per sorgenti e rilasci OTA.

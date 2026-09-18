@@ -8,8 +8,8 @@ plugins {
 }
 
 android {
-    namespace = "com.TaxFlowPro"
-    compileSdk = 36
+    namespace = "com.taxflowpro"
+    compileSdk = 37
     ndkVersion = flutter.ndkVersion
 
     compileOptions {
@@ -19,7 +19,7 @@ android {
 
     defaultConfig {
         // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
-        applicationId = "com.TaxFlowPro"
+        applicationId = "com.taxflowpro"
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
         minSdk = flutter.minSdkVersion

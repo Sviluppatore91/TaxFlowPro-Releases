@@ -50,19 +50,20 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyBNFN1Xe6o_eXbXmf36ZON905M-Kgi8O08',
-    appId: '1:960735169197:android:40cc9ea0aebe99740b1424',
-    messagingSenderId: '960735169197',
-    projectId: 'contabilita-8dd6d',
-    storageBucket: 'contabilita-8dd6d.firebasestorage.app',
+    apiKey: 'AIzaSyCe9wPpbtuxX4XW5N3bND4L4aSz5OaErhI',
+    appId: '1:573034076947:android:01b8bf609883e7b06d98e6',
+    messagingSenderId: '573034076947',
+    projectId: 'taxflowpro-f914c',
+    storageBucket: 'taxflowpro-f914c.firebasestorage.app',
   );
 
   static const FirebaseOptions windows = FirebaseOptions(
-    apiKey: 'AIzaSyBvlhqBiH6ndAXOvJURAZQkPxT45t-5iLM',
-    appId: '1:960735169197:web:ea0c172db9fd806f0b1424',
-    messagingSenderId: '960735169197',
-    projectId: 'contabilita-8dd6d',
-    authDomain: 'contabilita-8dd6d.firebaseapp.com',
-    storageBucket: 'contabilita-8dd6d.firebasestorage.app',
+    apiKey: 'AIzaSyBIDNyxFRKfktnvoCkw2nQW4GPs0mNmkE4',
+    appId: '1:573034076947:web:ee988fda30bedc5f6d98e6',
+    messagingSenderId: '573034076947',
+    projectId: 'taxflowpro-f914c',
+    authDomain: 'taxflowpro-f914c.firebaseapp.com',
+    storageBucket: 'taxflowpro-f914c.firebasestorage.app',
+    measurementId: 'G-2XWYKEPBWJ',
   );
 }

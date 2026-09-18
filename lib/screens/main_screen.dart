@@ -1,7 +1,6 @@
-import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:provider/provider.dart';
 import '../providers/app_theme_provider.dart';
 import 'dashboard_screen.dart';
 import 'payments_screen.dart';
@@ -12,7 +11,6 @@ import 'notes_screen.dart';
 import 'quotes_screen.dart';
 import 'login_screen.dart';
 import '../widgets/app_drawer.dart';
-import '../services/secure_storage_service.dart';
 
 class MainScreen extends StatefulWidget {
   final String role;
@@ -123,31 +121,132 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
   Widget build(BuildContext context) {
     // Reset activity timer on any interaction
     _lastActivity = DateTime.now();
-    final theme = context.watch<AppThemeProvider>();
+    final theme = Provider.of<AppThemeProvider>(context);
 
-    return Scaffold(
-      backgroundColor: theme.hasValidBackground ? Colors.transparent : const Color(0xFF121212),
-      body: Container(
-        decoration: theme.hasValidBackground
-            ? BoxDecoration(
-                image: DecorationImage(
-                  image: FileImage(File(theme.backgroundImagePath!)),
-                  fit: BoxFit.cover,
-                  colorFilter: ColorFilter.mode(
-                    Colors.black.withValues(alpha: 0.8), // Sfondo molto scuro per non dare fastidio
-                    BlendMode.darken,
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final bool isDesktop = constraints.maxWidth > 850;
+
+        if (isDesktop) {
+          return Scaffold(
+            backgroundColor: theme.scaffoldBackgroundColor,
+            body: Row(
+              children: [
+                SizedBox(
+                  width: 280,
+                  child: AppDrawer(
+                    currentIndex: _currentIndex,
+                    onItemSelected: (index) {
+                      setState(() => _currentIndex = index);
+                    },
+                    onLogout: _showLogoutConfirmation,
+                    isDesktop: true,
                   ),
                 ),
-              )
-            : null,
-        child: _screens[_currentIndex],
+                Expanded(
+                  child: Column(
+                    children: [
+                      // Top Bar Area
+                      _buildTopBar(context),
+                      // Main Content
+                      Expanded(
+                        child: _screens[_currentIndex],
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          );
+        }
+
+        return Scaffold(
+          backgroundColor: theme.scaffoldBackgroundColor,
+          appBar: AppBar(
+            backgroundColor: theme.scaffoldBackgroundColor,
+            elevation: 0,
+            iconTheme: const IconThemeData(color: Colors.white),
+            title: const Text('TaxFlow PRO', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+          ),
+          body: _screens[_currentIndex],
+          drawer: AppDrawer(
+            currentIndex: _currentIndex,
+            onItemSelected: (index) {
+              setState(() => _currentIndex = index);
+            },
+            onLogout: _showLogoutConfirmation,
+            isDesktop: false,
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildTopBar(BuildContext context) {
+    final theme = Provider.of<AppThemeProvider>(context, listen: false);
+    
+    return Container(
+      height: 80,
+      padding: const EdgeInsets.symmetric(horizontal: 32),
+      decoration: BoxDecoration(
+        color: theme.scaffoldBackgroundColor,
+        border: Border(bottom: BorderSide(color: Colors.white.withValues(alpha: 0.05))),
       ),
-      drawer: AppDrawer(
-        currentIndex: _currentIndex,
-        onItemSelected: (index) {
-          setState(() => _currentIndex = index);
-        },
-        onLogout: _showLogoutConfirmation,
+      child: Row(
+        children: [
+          Expanded(
+            child: Container(
+              height: 48,
+              decoration: BoxDecoration(
+                color: Colors.white.withValues(alpha: 0.02),
+                borderRadius: BorderRadius.circular(24),
+                border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
+              ),
+              child: TextField(
+                style: const TextStyle(color: Colors.white),
+                decoration: InputDecoration(
+                  hintText: 'Search anything...',
+                  hintStyle: TextStyle(color: Colors.white.withValues(alpha: 0.3)),
+                  prefixIcon: Icon(Icons.search, color: Colors.white.withValues(alpha: 0.3)),
+                  border: InputBorder.none,
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(width: 32),
+          Container(
+            width: 40,
+            height: 40,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: Colors.white.withValues(alpha: 0.1),
+            ),
+            child: const Icon(Icons.notifications_none, color: Colors.white),
+          ),
+          const SizedBox(width: 16),
+          Row(
+            children: [
+              CircleAvatar(
+                radius: 20,
+                backgroundColor: theme.primaryColor,
+                child: Text(
+                  widget.username.isNotEmpty ? widget.username[0].toUpperCase() : 'U',
+                  style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(widget.username.isNotEmpty ? widget.username : 'User', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                  Text(widget.role, style: TextStyle(color: Colors.white.withValues(alpha: 0.5), fontSize: 12)),
+                ],
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }

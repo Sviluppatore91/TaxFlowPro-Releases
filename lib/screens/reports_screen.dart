@@ -3,7 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
 
 class ReportsScreen extends StatelessWidget {
-  const ReportsScreen({Key? key}) : super(key: key);
+  const ReportsScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -33,7 +33,7 @@ class ReportsScreen extends StatelessWidget {
 class _ReportsList extends StatelessWidget {
   final String collection;
 
-  const _ReportsList({required this.collection, Key? key}) : super(key: key);
+  const _ReportsList({required this.collection});
 
   @override
   Widget build(BuildContext context) {

@@ -91,7 +91,7 @@ class _MemoFormScreenState extends State<MemoFormScreen> {
       }
 
       if (_memoType == 'MOVIMENTO') {
-        _dateCtrl.text = DateUtilsApp.formatDbDate(m['date']?.toString(), 'dd/MM/yyyy'); // Verrà aggiornato in build in base al tema
+        _dateCtrl.text = DateUtilsApp.formatDbDate(m['date']?.toString(), 'dd/MM/yyyy'); // Verrï¿½ aggiornato in build in base al tema
         _paymentMethod = m['payment_method'] ?? 'Bonifico';
         _invoiceDateCtrl.text = DateUtilsApp.formatDbDate(m['invoice_date']?.toString(), 'dd/MM/yyyy');
       } else {
@@ -144,8 +144,8 @@ class _MemoFormScreenState extends State<MemoFormScreen> {
       lastDate: DateTime(2100),
       builder: (context, child) => Theme(
         data: ThemeData.dark().copyWith(
-          colorScheme: const ColorScheme.dark(
-            primary: Colors.blueAccent,
+          colorScheme: ColorScheme.dark(
+            primary: Theme.of(context).colorScheme.primary,
             surface: Color(0xFF1E1E24),
           ),
         ),
@@ -231,7 +231,7 @@ class _MemoFormScreenState extends State<MemoFormScreen> {
         elevation: 0,
         actions: [
           IconButton(
-            icon: Icon(Icons.check, color: Colors.blueAccent),
+            icon: Icon(Icons.check, color: Theme.of(context).colorScheme.primary),
             onPressed: _isUploading ? null : _saveMemo,
           )
         ],
@@ -267,7 +267,7 @@ class _MemoFormScreenState extends State<MemoFormScreen> {
                           backgroundColor: WidgetStateProperty.resolveWith<Color>(
                             (Set<WidgetState> states) {
                               if (states.contains(WidgetState.selected)) {
-                                return Colors.blueAccent.withValues(alpha: 0.3);
+                                return Theme.of(context).colorScheme.primary.withValues(alpha: 0.3);
                               }
                               return Colors.transparent;
                             },
@@ -275,7 +275,7 @@ class _MemoFormScreenState extends State<MemoFormScreen> {
                           foregroundColor: WidgetStateProperty.resolveWith<Color>(
                             (Set<WidgetState> states) {
                               if (states.contains(WidgetState.selected)) {
-                                return Colors.blueAccent;
+                                return Theme.of(context).colorScheme.primary;
                               }
                               return Colors.white54;
                             },
@@ -287,7 +287,7 @@ class _MemoFormScreenState extends State<MemoFormScreen> {
                     Center(
                       child: Text(
                         'MEMO $_memoType',
-                        style: TextStyle(color: Colors.blueAccent, fontWeight: FontWeight.bold, fontSize: 18),
+                        style: TextStyle(color: Theme.of(context).colorScheme.primary, fontWeight: FontWeight.bold, fontSize: 18),
                       ),
                     ),
                     
@@ -299,7 +299,7 @@ class _MemoFormScreenState extends State<MemoFormScreen> {
                     style: TextStyle(color: Colors.white),
                     decoration: InputDecoration(
                       labelText: 'Titolo Memo (opzionale)',
-                      labelStyle: TextStyle(color: Colors.white.withOpacity(0.54)),
+                      labelStyle: TextStyle(color: Colors.white.withValues(alpha: 0.54)),
                     ),
                   ),
                   SizedBox(height: 16),
@@ -312,7 +312,7 @@ class _MemoFormScreenState extends State<MemoFormScreen> {
                         style: TextStyle(color: Colors.white),
                         decoration: InputDecoration(
                           labelText: _memoType == 'MOVIMENTO' ? 'Data Pagamento' : 'Data Fattura',
-                          labelStyle: TextStyle(color: Colors.white.withOpacity(0.54)),
+                          labelStyle: TextStyle(color: Colors.white.withValues(alpha: 0.54)),
                         ),
                       ),
                     ),
@@ -339,7 +339,7 @@ class _MemoFormScreenState extends State<MemoFormScreen> {
                       baseStyle: TextStyle(color: Colors.black),
                       decoration: InputDecoration(
                         labelText: 'Cliente',
-                        labelStyle: TextStyle(color: Colors.white.withOpacity(0.54)),
+                        labelStyle: TextStyle(color: Colors.white.withValues(alpha: 0.54)),
                       ),
                     ),
                     onSelected: (Map<String, dynamic>? val) {
@@ -363,7 +363,7 @@ class _MemoFormScreenState extends State<MemoFormScreen> {
                     style: TextStyle(color: Colors.white),
                     decoration: InputDecoration(
                       labelText: 'Cellulare Cliente',
-                      labelStyle: TextStyle(color: Colors.white.withOpacity(0.54)),
+                      labelStyle: TextStyle(color: Colors.white.withValues(alpha: 0.54)),
                     ),
                   ),
                   SizedBox(height: 16),
@@ -373,7 +373,7 @@ class _MemoFormScreenState extends State<MemoFormScreen> {
                     style: TextStyle(color: Colors.white),
                     decoration: InputDecoration(
                       labelText: 'Email Cliente',
-                      labelStyle: TextStyle(color: Colors.white.withOpacity(0.54)),
+                      labelStyle: TextStyle(color: Colors.white.withValues(alpha: 0.54)),
                     ),
                   ),
                   SizedBox(height: 16),
@@ -389,7 +389,7 @@ class _MemoFormScreenState extends State<MemoFormScreen> {
                       baseStyle: TextStyle(color: Colors.black),
                       decoration: InputDecoration(
                         labelText: 'Categoria',
-                        labelStyle: TextStyle(color: Colors.white.withOpacity(0.54)),
+                        labelStyle: TextStyle(color: Colors.white.withValues(alpha: 0.54)),
                       ),
                     ),
                     onSelected: (Map<String, dynamic>? val) {
@@ -409,7 +409,7 @@ class _MemoFormScreenState extends State<MemoFormScreen> {
                       baseStyle: TextStyle(color: Colors.black),
                       decoration: InputDecoration(
                         labelText: 'Tipo Servizio',
-                        labelStyle: TextStyle(color: Colors.white.withOpacity(0.54)),
+                        labelStyle: TextStyle(color: Colors.white.withValues(alpha: 0.54)),
                       ),
                     ),
                     onSelected: (Map<String, dynamic>? val) {
@@ -424,9 +424,9 @@ class _MemoFormScreenState extends State<MemoFormScreen> {
                     keyboardType: const TextInputType.numberWithOptions(decimal: true),
                     decoration: InputDecoration(
                       labelText: 'Importo',
-                      prefixText: '€ ',
+                      prefixText: 'ï¿½ ',
                       prefixStyle: TextStyle(color: Colors.white),
-                      labelStyle: TextStyle(color: Colors.white.withOpacity(0.54)),
+                      labelStyle: TextStyle(color: Colors.white.withValues(alpha: 0.54)),
                     ),
                   ),
                   SizedBox(height: 16),
@@ -440,7 +440,7 @@ class _MemoFormScreenState extends State<MemoFormScreen> {
                         baseStyle: TextStyle(color: Colors.black),
                         decoration: InputDecoration(
                           labelText: 'Metodo di Pagamento',
-                          labelStyle: TextStyle(color: Colors.white.withOpacity(0.54)),
+                          labelStyle: TextStyle(color: Colors.white.withValues(alpha: 0.54)),
                         ),
                       ),
                       onSelected: (val) => setState(() => _paymentMethod = val ?? 'Bonifico'),
@@ -454,7 +454,7 @@ class _MemoFormScreenState extends State<MemoFormScreen> {
                           style: TextStyle(color: Colors.white),
                           decoration: InputDecoration(
                             labelText: 'Data Fattura Relativa (Opzionale)',
-                            labelStyle: TextStyle(color: Colors.white.withOpacity(0.54)),
+                            labelStyle: TextStyle(color: Colors.white.withValues(alpha: 0.54)),
                           ),
                         ),
                       ),
@@ -468,7 +468,7 @@ class _MemoFormScreenState extends State<MemoFormScreen> {
                       style: TextStyle(color: Colors.white),
                       decoration: InputDecoration(
                         labelText: 'Numero Fattura (es. FPA 2/26)',
-                        labelStyle: TextStyle(color: Colors.white.withOpacity(0.54)),
+                        labelStyle: TextStyle(color: Colors.white.withValues(alpha: 0.54)),
                       ),
                     ),
                     SizedBox(height: 16),
@@ -480,7 +480,7 @@ class _MemoFormScreenState extends State<MemoFormScreen> {
                         baseStyle: TextStyle(color: Colors.black),
                         decoration: InputDecoration(
                           labelText: 'Codice IVA',
-                          labelStyle: TextStyle(color: Colors.white.withOpacity(0.54)),
+                          labelStyle: TextStyle(color: Colors.white.withValues(alpha: 0.54)),
                         ),
                       ),
                       onSelected: (val) => setState(() => _vatCode = val),
@@ -494,7 +494,7 @@ class _MemoFormScreenState extends State<MemoFormScreen> {
                           style: TextStyle(color: Colors.white),
                           decoration: InputDecoration(
                             labelText: 'Data Evento (opzionale)',
-                            labelStyle: TextStyle(color: Colors.white.withOpacity(0.54)),
+                            labelStyle: TextStyle(color: Colors.white.withValues(alpha: 0.54)),
                           ),
                         ),
                       ),
@@ -508,14 +508,14 @@ class _MemoFormScreenState extends State<MemoFormScreen> {
                     maxLines: 3,
                     decoration: InputDecoration(
                       labelText: 'Note Evento',
-                      labelStyle: TextStyle(color: Colors.white.withOpacity(0.54)),
+                      labelStyle: TextStyle(color: Colors.white.withValues(alpha: 0.54)),
                     ),
                   ),
                   SizedBox(height: 24),
                   
                   // --- Allegati ---
                   Text('Allegati (Foto/File)',
-                      style: TextStyle(color: Colors.white.withOpacity(0.7), fontWeight: FontWeight.bold, fontSize: 14)),
+                      style: TextStyle(color: Colors.white.withValues(alpha: 0.7), fontWeight: FontWeight.bold, fontSize: 14)),
                   SizedBox(height: 8),
                   if (_attachments.isNotEmpty)
                     ..._attachments.asMap().entries.map((entry) {
@@ -530,7 +530,7 @@ class _MemoFormScreenState extends State<MemoFormScreen> {
                         ),
                         child: Row(
                           children: [
-                            Icon(Icons.attachment, color: Colors.blueAccent, size: 20),
+                            Icon(Icons.attachment, color: Theme.of(context).colorScheme.primary, size: 20),
                             SizedBox(width: 8),
                             Expanded(
                               child: InkWell(
@@ -538,7 +538,7 @@ class _MemoFormScreenState extends State<MemoFormScreen> {
                                 child: Text(
                                   'Apri Allegato ${idx + 1}',
                                   style: TextStyle(
-                                      color: Colors.blueAccent,
+                                      color: Theme.of(context).colorScheme.primary,
                                       decoration: TextDecoration.underline),
                                 ),
                               ),
@@ -563,7 +563,7 @@ class _MemoFormScreenState extends State<MemoFormScreen> {
                   if (_isUploading)
                     Padding(
                       padding: EdgeInsets.all(8.0),
-                      child: Center(child: CircularProgressIndicator(color: Colors.blueAccent)),
+                      child: Center(child: CircularProgressIndicator(color: Theme.of(context).colorScheme.primary)),
                     ),
                   SizedBox(height: 8),
                   Row(
@@ -571,11 +571,11 @@ class _MemoFormScreenState extends State<MemoFormScreen> {
                     children: [
                       if (Platform.isAndroid || Platform.isIOS)
                         IconButton(
-                          icon: Icon(Icons.camera_alt, color: Colors.white.withOpacity(0.54)),
+                          icon: Icon(Icons.camera_alt, color: Colors.white.withValues(alpha: 0.54)),
                           onPressed: () => _pickAttachment(true),
                         ),
                       IconButton(
-                        icon: Icon(Icons.image, color: Colors.white.withOpacity(0.54)),
+                        icon: Icon(Icons.image, color: Colors.white.withValues(alpha: 0.54)),
                         onPressed: () => _pickAttachment(false),
                       ),
                     ],
@@ -588,7 +588,7 @@ class _MemoFormScreenState extends State<MemoFormScreen> {
                     child: ElevatedButton(
                       onPressed: _isUploading ? null : _saveMemo,
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.blueAccent,
+                        backgroundColor: Theme.of(context).colorScheme.primary,
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                       ),
                       child: Text('Salva Memo', style: TextStyle(color: Colors.white, fontSize: 16)),
@@ -603,6 +603,5 @@ class _MemoFormScreenState extends State<MemoFormScreen> {
     );
   }
 }
-
 
 

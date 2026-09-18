@@ -98,7 +98,7 @@ class _ChangelogScreenState extends State<ChangelogScreen> {
             width: double.infinity,
             decoration: BoxDecoration(
               color: theme.cardColor,
-              border: Border(bottom: BorderSide(color: theme.borderColor)),
+              border: Border(bottom: BorderSide(color: Colors.white.withValues(alpha: 0.1))),
             ),
             child: Column(
               children: [
@@ -111,7 +111,7 @@ class _ChangelogScreenState extends State<ChangelogScreen> {
                 SizedBox(height: 8),
                 Text(
                   'Versione corrente: $_currentVersion',
-                  style: TextStyle(color: Colors.white.withOpacity(0.7), fontSize: 16),
+                  style: TextStyle(color: Colors.white.withValues(alpha: 0.7), fontSize: 16),
                 ),
               ],
             ),
@@ -133,7 +133,7 @@ class _ChangelogScreenState extends State<ChangelogScreen> {
                     color: isCurrent ? theme.primaryColor.withValues(alpha: 0.1) : theme.cardColor,
                     borderRadius: BorderRadius.circular(12),
                     border: Border.all(
-                      color: isCurrent ? theme.primaryColor.withValues(alpha: 0.5) : theme.borderColor,
+                      color: isCurrent ? theme.primaryColor.withValues(alpha: 0.5) : Colors.white.withValues(alpha: 0.1),
                     ),
                   ),
                   child: Padding(
@@ -154,7 +154,7 @@ class _ChangelogScreenState extends State<ChangelogScreen> {
                             ),
                             Text(
                               log['date'],
-                              style: TextStyle(color: Colors.white.withOpacity(0.54), fontSize: 12),
+                              style: TextStyle(color: Colors.white.withValues(alpha: 0.54), fontSize: 12),
                             ),
                           ],
                         ),
@@ -164,9 +164,9 @@ class _ChangelogScreenState extends State<ChangelogScreen> {
                           child: Row(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text('• ', style: TextStyle(color: Colors.white.withOpacity(0.7), fontSize: 14)),
+                              Text('• ', style: TextStyle(color: Colors.white.withValues(alpha: 0.7), fontSize: 14)),
                               Expanded(
-                                child: Text(c, style: TextStyle(color: Colors.white.withOpacity(0.7), fontSize: 14)),
+                                child: Text(c, style: TextStyle(color: Colors.white.withValues(alpha: 0.7), fontSize: 14)),
                               ),
                             ],
                           ),

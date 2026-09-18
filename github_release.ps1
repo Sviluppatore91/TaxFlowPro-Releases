@@ -41,8 +41,11 @@ if (-not $msixExists) {
 Write-Host "`n[3/4] Copia locale su Desktop..." -ForegroundColor Yellow
 
 # Directory di esportazione finali (senza sottocartelle Android e PC, tutto nella stessa cartella TaxFlowPro come richiesto)
-$destDir = "C:\Users\Hp\Desktop\TaxFlowPro"
+$destDir = "C:\Users\Hp\Desktop\APK Appstore Contabile\Nuove release"
 if (-not (Test-Path $destDir)) { New-Item -ItemType Directory -Force -Path $destDir | Out-Null }
+
+Write-Host "  Pulizia vecchie release in locale..." -ForegroundColor DarkCyan
+Remove-Item -Path "$destDir\*" -Recurse -Force -ErrorAction SilentlyContinue
 
 # APK
 $apkSrcPath = "build\app\outputs\flutter-apk\app-release.apk"
@@ -65,14 +68,38 @@ if (Test-Path $msixSrcPath) {
     $pcAssetName = "TaxFlowPro_v$($version)_update.msix"
     $pcContentType = "application/msix"
 } else {
-    # Fallback: crea un portable ZIP
-    $zipPath = "$destDir\TaxFlowPro_v$($version)_portable.zip"
-    Write-Host "  Creo portable ZIP da $winReleasePath..." -ForegroundColor DarkCyan
-    Compress-Archive -Path "$winReleasePath\*" -DestinationPath $zipPath -Force
-    $pcAssetPath = $zipPath
-    $pcAssetName = "TaxFlowPro_v$($version)_portable.zip"
-    $pcContentType = "application/zip"
-    Write-Host "Portable ZIP creato: $zipPath"
+    # Fallback: crea un portable EXE auto-estraente con WinRAR (SFX)
+    $exePath = "$destDir\TaxFlowPro_v$($version)_portable.exe"
+    Write-Host "  Creo portable EXE (SFX) da $winReleasePath..." -ForegroundColor DarkCyan
+    
+    $sfxConfig = "$env:TEMP\sfx_config.txt"
+    @"
+Path=%temp%\TaxFlowPro
+Setup=contabile_app.exe
+Silent=1
+Overwrite=1
+"@ | Out-File -FilePath $sfxConfig -Encoding utf8
+    
+    $winRarPath = "C:\Program Files\WinRAR\WinRAR.exe"
+    if (Test-Path $winRarPath) {
+        $absExe = Resolve-Path $destDir | Join-Path -ChildPath "TaxFlowPro_v$($version)_portable.exe"
+        $absIcon = Resolve-Path "windows\runner\resources\app_icon.ico"
+        Push-Location $winReleasePath
+        & $winRarPath a -sfx -iicon"$absIcon" -z"$sfxConfig" -r "$absExe" "*" | Out-Null
+        Pop-Location
+        $pcAssetPath = $absExe
+        $pcAssetName = "TaxFlowPro_v$($version)_portable.exe"
+        $pcContentType = "application/x-msdownload"
+        Write-Host "Portable EXE creato: $absExe"
+    } else {
+        Write-Host "  WinRAR non trovato. Fallback a ZIP..." -ForegroundColor Red
+        $zipPath = "$destDir\TaxFlowPro_v$($version)_portable.zip"
+        Compress-Archive -Path "$winReleasePath\*" -DestinationPath $zipPath -Force
+        $pcAssetPath = $zipPath
+        $pcAssetName = "TaxFlowPro_v$($version)_portable.zip"
+        $pcContentType = "application/zip"
+        Write-Host "Portable ZIP creato: $zipPath"
+    }
 }
 
 # â”€â”€ 4. Pubblica su GitHub â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€

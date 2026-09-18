@@ -47,11 +47,11 @@ class _PaymentsScreenState extends State<PaymentsScreen> {
       builder: (ctx) => AlertDialog(
         backgroundColor: const Color(0xFF1E1E24),
         title: Text('Elimina', style: TextStyle(color: Colors.white)),
-        content: Text('Sei sicuro di voler eliminare questo movimento?', style: TextStyle(color: Colors.white.withOpacity(0.7))),
+        content: Text('Sei sicuro di voler eliminare questo movimento?', style: TextStyle(color: Colors.white.withValues(alpha: 0.7))),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx, false),
-            child: Text('Annulla', style: TextStyle(color: Colors.white.withOpacity(0.54))),
+            child: Text('Annulla', style: TextStyle(color: Colors.white.withValues(alpha: 0.54))),
           ),
           TextButton(
             onPressed: () => Navigator.pop(ctx, true),
@@ -95,7 +95,7 @@ class _PaymentsScreenState extends State<PaymentsScreen> {
         elevation: 0,
         actions: [
           IconButton(
-            icon: Icon(Icons.print, color: Colors.blueAccent),
+            icon: Icon(Icons.print, color: Theme.of(context).colorScheme.primary),
             tooltip: 'Esporta in PDF',
             onPressed: () async {
               if (_payments.isEmpty) return;
@@ -107,11 +107,10 @@ class _PaymentsScreenState extends State<PaymentsScreen> {
                 return ReportUtils.isDateInRange(date, range);
               }).toList();
               if (filteredPayments.isEmpty) {
-                if (mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Nessun movimento nel periodo selezionato.')),
-                  );
-                }
+                if (!mounted) return;
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Nessun movimento nel periodo selezionato.')),
+                );
                 return;
               }
               final List<List<String>> data = filteredPayments.map<List<String>>((p) {
@@ -129,9 +128,13 @@ class _PaymentsScreenState extends State<PaymentsScreen> {
                   String metodo = p['payment_method']?.toString() ?? '';
                   if (metodo.toLowerCase() == 'bonifico') {
                     metodo = 'BON';
-                  } else if (metodo.toLowerCase() == 'contanti') metodo = 'C/C';
-                  else if (metodo.toLowerCase() == 'assegno') metodo = 'ASS';
-                  else if (metodo.toLowerCase() == 'pos') metodo = 'POS';
+                  } else if (metodo.toLowerCase() == 'contanti') {
+                    metodo = 'C/C';
+                  } else if (metodo.toLowerCase() == 'assegno') {
+                    metodo = 'ASS';
+                  } else if (metodo.toLowerCase() == 'pos') {
+                    metodo = 'POS';
+                  }
                   
                   final importo = CurrencyUtils.formatEuro(double.tryParse(p['amount']?.toString() ?? '0') ?? 0);
                   
@@ -168,7 +171,7 @@ class _PaymentsScreenState extends State<PaymentsScreen> {
             },
           ),
           IconButton(
-            icon: Icon(Icons.add, color: Colors.blueAccent),
+            icon: Icon(Icons.add, color: Theme.of(context).colorScheme.primary),
             onPressed: () async {
               await Navigator.push(context, MaterialPageRoute(builder: (_) => const PaymentFormScreen()));
               _loadPayments();
@@ -177,7 +180,7 @@ class _PaymentsScreenState extends State<PaymentsScreen> {
         ],
       ),
       body: _isLoading
-          ? Center(child: CircularProgressIndicator(color: Colors.blueAccent))
+          ? Center(child: CircularProgressIndicator(color: Theme.of(context).colorScheme.primary))
           : ListView.builder(
               padding: const EdgeInsets.all(16),
               itemCount: _payments.length,
@@ -200,7 +203,7 @@ class _PaymentsScreenState extends State<PaymentsScreen> {
                   decoration: BoxDecoration(
                     color: theme.cardColor,
                     borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: theme.borderColor),
+                    border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
                   ),
                   child: Material(
                     type: MaterialType.transparency,
@@ -227,7 +230,7 @@ class _PaymentsScreenState extends State<PaymentsScreen> {
                             SizedBox(width: 8),
                             Text(
                               DateUtilsApp.formatDbDate(p['date']?.toString(), theme.dateFormat),
-                              style: TextStyle(color: Colors.white.withOpacity(0.7), fontSize: 13),
+                              style: TextStyle(color: Colors.white.withValues(alpha: 0.7), fontSize: 13),
                             ),
                             SizedBox(width: 12),
                             Expanded(
@@ -242,7 +245,7 @@ class _PaymentsScreenState extends State<PaymentsScreen> {
                             if (p['attachments'] != null && p['attachments'] != '[]')
                               Padding(
                                 padding: EdgeInsets.only(right: 8.0),
-                                child: Icon(Icons.attachment, color: Colors.blueAccent, size: 20),
+                                child: Icon(Icons.attachment, color: Theme.of(context).colorScheme.primary, size: 20),
                               ),
                             Text(
                               CurrencyUtils.formatEuro(double.tryParse(p['amount']?.toString() ?? '0') ?? 0),

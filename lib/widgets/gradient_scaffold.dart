@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/app_theme_provider.dart';
@@ -8,6 +7,7 @@ class GradientScaffold extends StatelessWidget {
   final PreferredSizeWidget? appBar;
   final Widget? floatingActionButton;
   final Widget? drawer;
+  final bool useSafeArea;
 
   const GradientScaffold({
     super.key,
@@ -15,6 +15,7 @@ class GradientScaffold extends StatelessWidget {
     this.appBar,
     this.floatingActionButton,
     this.drawer,
+    this.useSafeArea = true,
   });
 
   @override
@@ -22,7 +23,7 @@ class GradientScaffold extends StatelessWidget {
     final theme = context.watch<AppThemeProvider>();
 
     return Scaffold(
-      backgroundColor: Colors.transparent,
+      backgroundColor: theme.scaffoldBackgroundColor,
       extendBodyBehindAppBar: true,
       appBar: appBar,
       drawer: drawer,
@@ -30,30 +31,22 @@ class GradientScaffold extends StatelessWidget {
       body: Stack(
         fit: StackFit.expand,
         children: [
-          // Layer 1: sfondo
-          if (theme.hasValidBackground)
-            Image.file(
-              File(theme.backgroundImagePath!),
-              fit: BoxFit.cover,
-              color: Colors.black.withValues(alpha: 0.35),
-              colorBlendMode: BlendMode.darken,
-            )
-          else
-            Container(
-              decoration: const BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [
-                    Color(0xFF0F2027),
-                    Color(0xFF203A43),
-                    Color(0xFF2C5364),
-                  ],
-                ),
+          // Layer 1: Sfondo fisso "Lens Flare" Bimbomixer style
+          Container(
+            decoration: BoxDecoration(
+              gradient: RadialGradient(
+                center: const Alignment(-0.5, -0.5),
+                radius: 1.5,
+                colors: [
+                  theme.primaryColor.withValues(alpha: 0.15), // Accent glow from top left
+                  theme.scaffoldBackgroundColor, // Deep dark base
+                  Colors.black, // Darker edges
+                ],
               ),
             ),
+          ),
           // Layer 2: contenuto
-          SafeArea(child: body ?? const SizedBox.shrink()),
+          useSafeArea ? SafeArea(child: body ?? const SizedBox.shrink()) : (body ?? const SizedBox.shrink()),
         ],
       ),
     );

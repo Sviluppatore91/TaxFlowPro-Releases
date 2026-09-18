@@ -16,7 +16,7 @@ void main() {
       'amount': amount,
       'date': date,
       'type': type,
-      if (invoiceId != null) 'invoice_id': invoiceId,
+      'invoice_id': ?invoiceId,
       'category_id': categoryId ?? 'cat1',
       'service_id': serviceId ?? 'srv1',
       'payment_method': paymentMethod,

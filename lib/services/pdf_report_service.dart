@@ -32,7 +32,7 @@ class PDFReportService {
     // Carica il logo
     pw.ImageProvider? logoImage;
     try {
-      final ByteData imageData = await rootBundle.load('assets/logo.jpg');
+      final ByteData imageData = await rootBundle.load('assets/TaxFlowPro_logo.jpg');
       final Uint8List imageBytes = imageData.buffer.asUint8List();
       logoImage = pw.MemoryImage(imageBytes);
     } catch (e) {

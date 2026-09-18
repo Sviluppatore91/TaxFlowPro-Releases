@@ -4,13 +4,14 @@ import '../database/database_helper.dart';
 import 'package:provider/provider.dart';
 import '../providers/app_theme_provider.dart';
 import 'package:marquee/marquee.dart';
-import 'package:tax_flow_pro/services/update_service.dart';
-import 'package:tax_flow_pro/widgets/update_dialog.dart';
-import 'package:audioplayers/audioplayers.dart';
-import 'package:tax_flow_pro/screens/invoices_screen.dart';
-import 'package:tax_flow_pro/screens/security_center_screen.dart';
 import 'package:tax_flow_pro/utils/calculation_engine.dart';
 import '../utils/currency_utils.dart';
+import '../widgets/dashboard_line_chart.dart';
+import '../widgets/dashboard_stat_cards.dart';
+import '../widgets/dashboard_pie_chart.dart';
+import '../widgets/recent_activity_sidebar.dart';
+import '../widgets/pending_tasks_sidebar.dart';
+import '../widgets/glass_container.dart';
 
 class DashboardScreen extends StatefulWidget {
   final String role;
@@ -22,7 +23,7 @@ class DashboardScreen extends StatefulWidget {
 
 class _DashboardScreenState extends State<DashboardScreen> {
   final DatabaseHelper _dbHelper = DatabaseHelper();
-  int _selectedYear = DateTime.now().year;
+  final int _selectedYear = DateTime.now().year;
 
   bool _isLoading = true;
   double _totalIn = 0;
@@ -52,88 +53,97 @@ class _DashboardScreenState extends State<DashboardScreen> {
   Future<void> _loadDashboardData() async {
     setState(() => _isLoading = true);
 
-    final payments = await _dbHelper.getPayments(year: _selectedYear);
-    final paymentsLastYear = await _dbHelper.getPayments(
-      year: _selectedYear - 1,
-    );
+    try {
+      final payments = await _dbHelper.getPayments(year: _selectedYear);
+      final paymentsLastYear = await _dbHelper.getPayments(
+        year: _selectedYear - 1,
+      );
 
-    final deadlines = await _dbHelper.getDeadlines();
-    final invoices = await _dbHelper.getInvoices();
+      final deadlines = await _dbHelper.getDeadlines();
+      final invoices = await _dbHelper.getInvoices();
 
-    final categories = await _dbHelper.getCategories();
-    Map<String, String> categoryNames = {};
-    Map<String, String> categoryColorsHex = {};
-    for (var c in categories) {
-      categoryNames[c['id']] = c['name'];
-      if (c['color_hex'] != null) {
-        categoryColorsHex[c['id']] = c['color_hex'];
+      final categories = await _dbHelper.getCategories();
+      Map<String, String> categoryNames = {};
+      Map<String, String> categoryColorsHex = {};
+      for (var c in categories) {
+        categoryNames[c['id']] = c['name'];
+        if (c['color_hex'] != null) {
+          categoryColorsHex[c['id']] = c['color_hex'];
+        }
+      }
+      
+      final services = await _dbHelper.getServiceTypes();
+      Map<String, String> serviceNames = {};
+      Map<String, String> serviceColorsHex = {};
+      for (var s in services) {
+        serviceNames[s['id']] = s['name'];
+        if (s['color_hex'] != null) {
+          serviceColorsHex[s['id']] = s['color_hex'];
+        }
+      }
+
+      final metrics = CalculationEngine.computeDashboardMetrics(
+        payments: payments,
+        paymentsLastYear: paymentsLastYear,
+        invoices: invoices,
+        deadlines: deadlines,
+        categoryNames: categoryNames,
+        serviceNames: serviceNames,
+        selectedYear: _selectedYear,
+      );
+
+      final metricsLastYear = CalculationEngine.computeDashboardMetrics(
+        payments: paymentsLastYear,
+        paymentsLastYear: [],
+        invoices: invoices,
+        deadlines: deadlines,
+        categoryNames: categoryNames,
+        serviceNames: serviceNames,
+        selectedYear: _selectedYear - 1,
+      );
+
+      Map<String, Color> tempColors = {};
+      for (var catName in metrics.categoryBreakdown.keys) {
+        var categoryId = categoryNames.entries.firstWhere((e) => e.value == catName, orElse: () => const MapEntry('', '')).key;
+        if (categoryId.isNotEmpty && categoryColorsHex[categoryId] != null) {
+          tempColors[catName] = Color(int.parse(categoryColorsHex[categoryId]!));
+        }
+      }
+      for (var srvName in metrics.serviceBreakdown.keys) {
+        var serviceId = serviceNames.entries.firstWhere((e) => e.value == srvName, orElse: () => const MapEntry('', '')).key;
+        if (serviceId.isNotEmpty && serviceColorsHex[serviceId] != null) {
+          tempColors[srvName] = Color(int.parse(serviceColorsHex[serviceId]!));
+        }
+      }
+      tempColors['Fatturato'] = Theme.of(context).colorScheme.primary;
+      tempColors['Contante'] = Theme.of(context).colorScheme.secondary;
+
+      setState(() {
+        _totalIn = metrics.totalIn;
+        _totalOut = metrics.totalOut;
+        _totalInLastYear = metricsLastYear.totalIn;
+        _totalOutLastYear = metricsLastYear.totalOut;
+        _payments = payments;
+        _deadlines = deadlines;
+        _invoices = invoices;
+        _monthlyNet = metrics.monthlyNet;
+        _chartDataCategoria = metrics.categoryBreakdown;
+        _chartDataPrestazione = metrics.serviceBreakdown;
+        _chartDataFatturatoContante = metrics.paymentMethodBreakdown;
+        _categoryNames = categoryNames;
+        _serviceNames = serviceNames;
+        _categoryColors = tempColors;
+        _totalDeadlinesPaid = metrics.totalDeadlinesPaid;
+        _isLoading = false;
+      });
+    } catch (e) {
+      debugPrint('Error loading dashboard data: $e');
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
       }
     }
-    
-    final services = await _dbHelper.getServiceTypes();
-    Map<String, String> serviceNames = {};
-    Map<String, String> serviceColorsHex = {};
-    for (var s in services) {
-      serviceNames[s['id']] = s['name'];
-      if (s['color_hex'] != null) {
-        serviceColorsHex[s['id']] = s['color_hex'];
-      }
-    }
-
-    final metrics = CalculationEngine.computeDashboardMetrics(
-      payments: payments,
-      paymentsLastYear: paymentsLastYear,
-      invoices: invoices,
-      deadlines: deadlines,
-      categoryNames: categoryNames,
-      serviceNames: serviceNames,
-      selectedYear: _selectedYear,
-    );
-
-    final metricsLastYear = CalculationEngine.computeDashboardMetrics(
-      payments: paymentsLastYear,
-      paymentsLastYear: [],
-      invoices: invoices,
-      deadlines: deadlines,
-      categoryNames: categoryNames,
-      serviceNames: serviceNames,
-      selectedYear: _selectedYear - 1,
-    );
-
-    Map<String, Color> tempColors = {};
-    for (var catName in metrics.categoryBreakdown.keys) {
-      var categoryId = categoryNames.entries.firstWhere((e) => e.value == catName, orElse: () => const MapEntry('', '')).key;
-      if (categoryId.isNotEmpty && categoryColorsHex[categoryId] != null) {
-        tempColors[catName] = Color(int.parse(categoryColorsHex[categoryId]!));
-      }
-    }
-    for (var srvName in metrics.serviceBreakdown.keys) {
-      var serviceId = serviceNames.entries.firstWhere((e) => e.value == srvName, orElse: () => const MapEntry('', '')).key;
-      if (serviceId.isNotEmpty && serviceColorsHex[serviceId] != null) {
-        tempColors[srvName] = Color(int.parse(serviceColorsHex[serviceId]!));
-      }
-    }
-    tempColors['Fatturato'] = Colors.blueAccent;
-    tempColors['Contante'] = Colors.greenAccent;
-
-    setState(() {
-      _totalIn = metrics.totalIn;
-      _totalOut = metrics.totalOut;
-      _totalInLastYear = metricsLastYear.totalIn;
-      _totalOutLastYear = metricsLastYear.totalOut;
-      _payments = payments;
-      _deadlines = deadlines;
-      _invoices = invoices;
-      _monthlyNet = metrics.monthlyNet;
-      _chartDataCategoria = metrics.categoryBreakdown;
-      _chartDataPrestazione = metrics.serviceBreakdown;
-      _chartDataFatturatoContante = metrics.paymentMethodBreakdown;
-      _categoryNames = categoryNames;
-      _serviceNames = serviceNames;
-      _categoryColors = tempColors;
-      _totalDeadlinesPaid = metrics.totalDeadlinesPaid;
-      _isLoading = false;
-    });
   }
 
   String _calculatePercentageChange(double current, double previous) {
@@ -146,520 +156,231 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
     return Scaffold(
       backgroundColor: Colors.transparent,
-      appBar: AppBar(
-        leading: Builder(
-          builder: (context) => IconButton(
-            icon: Icon(Icons.menu, color: Colors.white),
-            onPressed: () {
-              context.findRootAncestorStateOfType<ScaffoldState>()?.openDrawer();
-            },
-          ),
-        ),
-        title: Row(
-          children: [
-            Icon(Icons.account_balance_wallet, color: Colors.blueAccent),
-            SizedBox(width: 8),
-            Expanded(
-              child: AutoScrollText(
-                text: 'TaxFlowPro CONTABILITÀ $_selectedYear',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 16,
-                ),
-              ),
-            ),
-          ],
-        ),
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        actions: [
-          if (widget.role == 'admin')
-            IconButton(
-              icon: Icon(Icons.security, color: Colors.white),
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => const SecurityCenterScreen()),
-                );
-              },
-            ),
-          IconButton(
-            icon: Icon(Icons.notifications_none, color: Colors.white),
-            onPressed: () async {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text("Controllo aggiornamenti in corso..."), duration: Duration(seconds: 1)),
-              );
-              final updateService = UpdateService();
-              final updateData = await updateService.checkForUpdate();
-              if (updateData != null && context.mounted) {
-                try {
-                  final player = AudioPlayer();
-                  await player.play(AssetSource('audio/notification.mp3'));
-                } catch (e) {
-                  print("Errore riproduzione suono: $e");
-                }
-                showDialog(
-                  context: context,
-                  barrierDismissible: false,
-                  builder: (ctx) => UpdateDialog(updateData: updateData, updateService: updateService),
-                );
-              } else if (context.mounted) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text("Nessun aggiornamento disponibile.")),
-                );
-              }
-            },
-          ),
-          SizedBox(width: 8),
-        ],
-      ),
       body: _isLoading
           ? Center(
-              child: CircularProgressIndicator(color: Colors.blueAccent),
+              child: CircularProgressIndicator(color: Theme.of(context).colorScheme.primary),
             )
-          : RefreshIndicator(
-              onRefresh: _loadDashboardData,
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    _buildPatrimonioCard(theme),
-                    SizedBox(height: 16),
-                    _buildMetricsGrid(theme),
-                    SizedBox(height: 16),
-                    _buildChartsSection(theme),
-                    SizedBox(height: 16),
-                    _buildListsSection(theme),
-                  ],
-                ),
-              ),
-            ),
-    );
-  }
-
-  Widget _buildPatrimonioCard(AppThemeProvider theme) {
-    double netto = _totalIn - _totalOut - _totalDeadlinesPaid;
-    double nettoLastYear = _totalInLastYear - _totalOutLastYear;
-    String change = _calculatePercentageChange(netto, nettoLastYear);
-    bool isPositive = !change.startsWith('-');
-
-    return Container(
-      padding: const EdgeInsets.all(24),
-      decoration: BoxDecoration(
-        color: theme.cardColor,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: theme.borderColor),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'PATRIMONIO NETTO',
-                style: TextStyle(
-                  color: Colors.white.withOpacity(0.54),
-                  fontSize: 14,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              SizedBox(height: 8),
-              Text(
-                CurrencyUtils.formatEuro(netto),
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 36,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              SizedBox(height: 8),
-              Row(
-                children: [
-                  Icon(
-                    isPositive ? Icons.arrow_upward : Icons.arrow_downward,
-                    color: isPositive ? Colors.greenAccent : Colors.redAccent,
-                    size: 16,
-                  ),
-                  SizedBox(width: 4),
-                  Text(
-                    '$change rispetto all\'anno scorso',
-                    style: TextStyle(
-                      color: isPositive ? Colors.greenAccent : Colors.redAccent,
-                      fontSize: 14,
-                    ),
-                  ),
-                ],
-              ),
-              if (_totalDeadlinesPaid > 0) ...[
-                SizedBox(height: 6),
-                Row(
-                  children: [
-                    Icon(Icons.event_busy, color: Colors.orangeAccent, size: 13),
-                    SizedBox(width: 4),
-                    Text(
-                      '- € ${CurrencyUtils.formatUI(_totalDeadlinesPaid, decimals: 2)} scadenze pagate',
-                      style: TextStyle(color: Colors.orangeAccent, fontSize: 12),
-                    ),
-                  ],
-                ),
-              ],
-            ],
-          ),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-            decoration: BoxDecoration(
-              color: Colors.white12,
-              borderRadius: BorderRadius.circular(20),
-            ),
-            child: DropdownButton<int>(
-              value: _selectedYear,
-              dropdownColor: const Color(0xFF1E1E24),
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-              ),
-              underline: SizedBox(),
-              icon: Icon(Icons.keyboard_arrow_down, color: Colors.white),
-              items: [2023, 2024, 2025, 2026, 2027, 2028].map((int value) {
-                return DropdownMenuItem<int>(
-                  value: value,
-                  child: Text(value.toString()),
-                );
-              }).toList(),
-              onChanged: (int? newValue) {
-                if (newValue != null) {
-                  setState(() => _selectedYear = newValue);
-                  _loadDashboardData();
-                }
-              },
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildMetricsGrid(AppThemeProvider theme) {
-    String inChange = _calculatePercentageChange(_totalIn, _totalInLastYear);
-    String outChange = _calculatePercentageChange(_totalOut, _totalOutLastYear);
-
-    double margin = _totalIn > 0
-        ? ((_totalIn - _totalOut) / _totalIn) * 100
-        : 0;
-
-    int unpaidInvoices = _invoices.where((i) => i['status'] != 'PAID').length;
-
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        int crossAxisCount = constraints.maxWidth > 800 ? 4 : 2;
-        return GridView.count(
-          crossAxisCount: crossAxisCount,
-          crossAxisSpacing: 16,
-          mainAxisSpacing: 16,
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          childAspectRatio: 2.5,
-          children: [
-            _metricCard(
-              theme,
-              "INCASSATO QUEST'ANNO",
-              CurrencyUtils.formatEuro(_totalIn),
-              inChange,
-              Icons.arrow_downward,
-              Colors.greenAccent,
-            ),
-            _metricCard(
-              theme,
-              "SPESO QUEST'ANNO",
-              CurrencyUtils.formatEuro(_totalOut),
-              outChange,
-              Icons.arrow_upward,
-              Colors.redAccent,
-            ),
-            _metricCard(
-              theme,
-              "FATTURE DA INCASSARE",
-              '$unpaidInvoices',
-              '$unpaidInvoices fatture in sospeso',
-              Icons.receipt,
-              Colors.orangeAccent,
-              isAmount: false,
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (_) => const InvoicesScreen()),
-                );
-              },
-            ),
-            _metricCard(
-              theme,
-              "MARGINE NETTO",
-              '${CurrencyUtils.formatUI(margin, decimals: 1)}%',
-              'sull\'incassato',
-              Icons.pie_chart,
-              Colors.purpleAccent,
-              isAmount: false,
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  Widget _metricCard(
-    AppThemeProvider theme,
-    String title,
-    String value,
-    String subtitle,
-    IconData icon,
-    Color color, {
-    bool isAmount = true,
-    VoidCallback? onTap,
-  }) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(16),
-      child: Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: theme.cardColor,
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: theme.borderColor),
-        ),
-        child: Row(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: color.withValues(alpha: 0.1),
-              shape: BoxShape.circle,
-            ),
-            child: Icon(icon, color: color, size: 24),
-          ),
-          SizedBox(width: 16),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.center,
+          : Row(
               children: [
-                SizedBox(
-                  height: 14,
-                  child: AutoScrollText(
-                    text: title,
-                    style: TextStyle(
-                      color: Colors.white.withOpacity(0.54),
-                      fontSize: 10,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-                SizedBox(height: 4),
-                SizedBox(
-                  height: 24,
-                  child: AutoScrollText(
-                    text: value,
-                    style: TextStyle(
-                      color: color,
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-                SizedBox(height: 2),
-                SizedBox(
-                  height: 14,
-                  child: AutoScrollText(
-                    text: isAmount ? '$subtitle vs ${_selectedYear - 1}' : subtitle,
-                    style: TextStyle(color: Colors.white.withOpacity(0.54), fontSize: 10),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    ));
-  }
-
-  Widget _buildChartsSection(AppThemeProvider theme) {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        bool isWide = constraints.maxWidth > 800;
-
-        if (isWide) {
-          return SizedBox(
-            height: 350,
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Expanded(flex: 2, child: _buildLineChartCard(theme)),
-                SizedBox(width: 16),
-                Expanded(flex: 1, child: _buildPieChartCard(theme)),
-              ],
-            ),
-          );
-        } else {
-          return Column(
-            children: [
-              SizedBox(height: 300, child: _buildLineChartCard(theme)),
-              SizedBox(height: 16),
-              SizedBox(height: 300, child: _buildPieChartCard(theme)),
-            ],
-          );
-        }
-      },
-    );
-  }
-
-  Widget _buildLineChartCard(AppThemeProvider theme) {
-    List<FlSpot> spots = [];
-    for (int i = 1; i <= 12; i++) {
-      spots.add(FlSpot(i.toDouble(), _monthlyNet[i] ?? 0.0));
-    }
-
-    // Calcola range asse Y
-    final allValues = spots.map((s) => s.y).toList();
-    double maxY = allValues.isEmpty ? 1000 : (allValues.reduce((a, b) => a > b ? a : b));
-    double minY = allValues.isEmpty ? 0 : (allValues.reduce((a, b) => a < b ? a : b));
-    maxY = maxY <= 0 ? 1000 : maxY * 1.2;
-    minY = minY >= 0 ? 0 : minY * 1.2;
-
-    String formatEuro(double v) {
-      if (v.abs() >= 1000) {
-        return CurrencyUtils.formatEuro((v / 1000)) + 'k';
-      }
-      return CurrencyUtils.formatEuro(v);
-    }
-
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: theme.cardColor,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: theme.borderColor),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'ANDAMENTO MENSILE',
-            style: TextStyle(
-              color: Colors.white.withOpacity(0.54),
-              fontSize: 12,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          SizedBox(height: 24),
-          Expanded(
-            child: LineChart(
-              LineChartData(
-                minY: minY,
-                maxY: maxY,
-                lineTouchData: LineTouchData(
-                  enabled: true,
-                  touchTooltipData: LineTouchTooltipData(
-                    getTooltipColor: (_) => const Color(0xFF1E2A3A),
-                    getTooltipItems: (touchedSpots) {
-                      return touchedSpots.map((spot) {
-                        const months = ['Gen','Feb','Mar','Apr','Mag','Giu','Lug','Ago','Set','Ott','Nov','Dic'];
-                        final month = spot.x.toInt() >= 1 && spot.x.toInt() <= 12
-                            ? months[spot.x.toInt() - 1]
-                            : '';
-                        final euroVal = spot.y >= 0
-                            ? CurrencyUtils.formatEuro(spot.y)
-                            : '- ' + CurrencyUtils.formatEuro(spot.y.abs());
-                        return LineTooltipItem(
-                          '$month\n$euroVal',
-                          TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 12,
-                          ),
-                        );
-                      }).toList();
-                    },
-                  ),
-                  handleBuiltInTouches: true,
-                ),
-                gridData: FlGridData(
-                  show: true,
-                  drawVerticalLine: false,
-                  getDrawingHorizontalLine: (value) =>
-                      FlLine(color: Colors.white10, strokeWidth: 1),
-                ),
-                titlesData: FlTitlesData(
-                  bottomTitles: AxisTitles(
-                    sideTitles: SideTitles(
-                      showTitles: true,
-                      reservedSize: 22,
-                      getTitlesWidget: (value, meta) {
-                        const months = [
-                          'Gen','Feb','Mar','Apr','Mag','Giu',
-                          'Lug','Ago','Set','Ott','Nov','Dic',
-                        ];
-                        if (value.toInt() >= 1 && value.toInt() <= 12) {
-                          return Padding(
-                            padding: const EdgeInsets.only(top: 8.0),
-                            child: Text(
-                              months[value.toInt() - 1],
-                              style: TextStyle(color: Colors.white.withOpacity(0.54), fontSize: 10),
+                // Main Content Area
+                Expanded(
+                  flex: 7,
+                  child: Padding(
+                    padding: const EdgeInsets.all(24.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        // Header
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              'Dashboard',
+                              style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold),
                             ),
-                          );
-                        }
-                        return SizedBox();
-                      },
-                    ),
-                  ),
-                  leftTitles: AxisTitles(
-                    sideTitles: SideTitles(
-                      showTitles: true,
-                      reservedSize: 52,
-                      getTitlesWidget: (value, meta) {
-                        if (value == meta.min || value == meta.max) return SizedBox();
-                        return Padding(
-                          padding: const EdgeInsets.only(right: 4),
-                          child: Text(
-                            formatEuro(value),
-                            style: TextStyle(color: Colors.white38, fontSize: 9),
-                            textAlign: TextAlign.right,
+                            Row(
+                              children: [
+                                Container(
+                                  width: 250,
+                                  height: 40,
+                                  decoration: BoxDecoration(
+                                    color: Colors.white.withValues(alpha: 0.05),
+                                    borderRadius: BorderRadius.circular(20),
+                                    border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
+                                  ),
+                                  child: TextField(
+                                    decoration: InputDecoration(
+                                      hintText: 'Cerca...',
+                                      hintStyle: TextStyle(color: Colors.white.withValues(alpha: 0.3)),
+                                      prefixIcon: Icon(Icons.search, color: Colors.white.withValues(alpha: 0.5), size: 18),
+                                      border: InputBorder.none,
+                                      contentPadding: EdgeInsets.symmetric(vertical: 12),
+                                    ),
+                                    style: TextStyle(color: Colors.white),
+                                  ),
+                                ),
+                                SizedBox(width: 16),
+                                Stack(
+                                  children: [
+                                    IconButton(
+                                      icon: Icon(Icons.notifications_none, color: Colors.white.withValues(alpha: 0.7)),
+                                      onPressed: () {},
+                                    ),
+                                    Positioned(
+                                      right: 8,
+                                      top: 8,
+                                      child: Container(
+                                        padding: EdgeInsets.all(4),
+                                        decoration: BoxDecoration(color: Colors.red, shape: BoxShape.circle),
+                                        child: Text('1', style: TextStyle(color: Colors.white, fontSize: 8, fontWeight: FontWeight.bold)),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                SizedBox(width: 8),
+                                Container(
+                                  padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                                  decoration: BoxDecoration(
+                                    color: Colors.white.withValues(alpha: 0.05),
+                                    borderRadius: BorderRadius.circular(20),
+                                  ),
+                                  child: Row(
+                                    children: [
+                                      Icon(Icons.person_outline, color: Colors.white.withValues(alpha: 0.7), size: 18),
+                                      SizedBox(width: 8),
+                                      Text('Profilo', style: TextStyle(color: Colors.white.withValues(alpha: 0.7), fontSize: 13)),
+                                      SizedBox(width: 4),
+                                      Icon(Icons.keyboard_arrow_down, color: Colors.white.withValues(alpha: 0.7), size: 16),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                        SizedBox(height: 24),
+                        // Line Chart
+                        Expanded(
+                          flex: 5,
+                          child: DashboardLineChart(monthlyNet: _monthlyNet),
+                        ),
+                        SizedBox(height: 16),
+                        // Stat Cards
+                        DashboardStatCards(
+                          totalRevenue: _totalIn,
+                          netIncome: _totalIn - _totalOut,
+                        ),
+                        SizedBox(height: 16),
+                        // Pie Chart
+                        Expanded(
+                          flex: 4,
+                          child: GlassContainer(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    const Text('Ripartizione', style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
+                                    DropdownButton<String>(
+                                      value: _chartFilter,
+                                      dropdownColor: const Color(0xFF1E1E1E),
+                                      style: const TextStyle(color: Colors.white),
+                                      underline: const SizedBox(),
+                                      icon: const Icon(Icons.arrow_drop_down, color: Colors.white),
+                                      items: ['Categoria', 'Prestazione', 'Fatturato vs Contante']
+                                          .map((e) => DropdownMenuItem(value: e, child: Text(e)))
+                                          .toList(),
+                                      onChanged: (val) {
+                                        if (val != null) {
+                                          setState(() => _chartFilter = val);
+                                        }
+                                      },
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 16),
+                                Expanded(
+                                  child: GestureDetector(
+                                    onTap: () {
+                                      showDialog(
+                                        context: context,
+                                        builder: (ctx) => _PieChartFullScreenDialog(
+                                          sortedCats: _getSortedCats(),
+                                          categoryColors: _categoryColors,
+                                          palette: _piePalette(),
+                                          title: 'Dettaglio Torta',
+                                          payments: _payments,
+                                          invoices: _invoices,
+                                          chartFilter: _chartFilter,
+                                          categoryNames: _categoryNames,
+                                          serviceNames: _serviceNames,
+                                        ),
+                                      );
+                                    },
+                                    child: Row(
+                                      children: [
+                                        Expanded(
+                                          flex: 1,
+                                          child: PieChart(
+                                            PieChartData(
+                                              sectionsSpace: 2,
+                                              centerSpaceRadius: 40,
+                                              sections: _getSortedCats().asMap().entries.map((e) {
+                                                final index = e.key;
+                                                final item = e.value;
+                                                final color = _piePalette()[index % _piePalette().length];
+                                                return PieChartSectionData(color: color, value: item.value, title: '', radius: 30);
+                                              }).toList(),
+                                            ),
+                                          ),
+                                        ),
+                                        Expanded(
+                                          flex: 1,
+                                          child: Column(
+                                            mainAxisAlignment: MainAxisAlignment.center,
+                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            children: _getSortedCats().take(5).toList().asMap().entries.map((e) {
+                                              final index = e.key;
+                                              final item = e.value;
+                                              final color = _piePalette()[index % _piePalette().length];
+                                              return Padding(
+                                                padding: const EdgeInsets.only(bottom: 8.0),
+                                                child: Row(
+                                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                  children: [
+                                                    Expanded(
+                                                      child: Row(
+                                                        children: [
+                                                          Container(width: 8, height: 8, decoration: BoxDecoration(color: color, shape: BoxShape.circle)),
+                                                          const SizedBox(width: 8),
+                                                          Expanded(child: AutoScrollText(text: item.key, style: TextStyle(color: Colors.white.withValues(alpha: 0.7), fontSize: 12))),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                    const SizedBox(width: 8),
+                                                    Text('€\${item.value.toStringAsFixed(2)}', style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold)),
+                                                  ],
+                                                ),
+                                              );
+                                            }).toList(),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
-                        );
-                      },
+                        ),
+                      ],
                     ),
                   ),
-                  topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                  rightTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
                 ),
-                borderData: FlBorderData(show: false),
-                lineBarsData: [
-                  LineChartBarData(
-                    spots: spots,
-                    isCurved: true,
-                    color: Colors.blueAccent,
-                    barWidth: 3,
-                    dotData: const FlDotData(show: false),
-                    belowBarData: BarAreaData(
-                      show: true,
-                      gradient: LinearGradient(
-                        colors: [
-                          Colors.blueAccent.withValues(alpha: 0.3),
-                          Colors.transparent,
-                        ],
-                        begin: Alignment.topCenter,
-                        end: Alignment.bottomCenter,
-                      ),
+                
+                // Sidebar Area
+                Expanded(
+                  flex: 3,
+                  child: Padding(
+                    padding: const EdgeInsets.only(top: 24.0, bottom: 24.0, right: 24.0, left: 0),
+                    child: Column(
+                      children: [
+                        Expanded(
+                          flex: 5,
+                          child: RecentActivitySidebar(activities: []),
+                        ),
+                        SizedBox(height: 16),
+                        Expanded(
+                          flex: 4,
+                          child: PendingTasksSidebar(tasks: []),
+                        ),
+                      ],
                     ),
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
-          ),
-        ],
-      ),
     );
   }
 
@@ -725,456 +446,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     );
   }
 
-  // ─── Card sulla dashboard ─────────────────────────────────────────────────
-  Widget _buildPieChartCard(AppThemeProvider theme) {
-    final sortedCats = _getSortedCats();
-    final palette = _piePalette();
 
-    List<PieChartSectionData> sections = [];
-    final total = sortedCats.fold<double>(0, (s, e) => s + e.value);
-    for (int i = 0; i < sortedCats.length; i++) {
-      final entry = sortedCats[i];
-      final color = _categoryColors[entry.key] ?? palette[i % palette.length];
-      final pct = total > 0 ? (entry.value / total * 100) : 0.0;
-      final badgeSize = pct > 10 ? 28.0 : 20.0; // Icona più piccola per sezioni piccole
-      
-      sections.add(PieChartSectionData(
-        color: color,
-        value: entry.value,
-        showTitle: false,
-        radius: 65,
-      ));
-    }
-    if (sections.isEmpty) {
-      sections.add(PieChartSectionData(color: Colors.white12, value: 1, title: '', radius: 65));
-    }
-
-    final showItems = sortedCats.length > 5 ? 5 : sortedCats.length;
-
-    return GestureDetector(
-      onTap: sortedCats.isNotEmpty
-          ? () => _showPieChartFullScreen(sortedCats, palette)
-          : null,
-      child: Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: theme.cardColor,
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: theme.borderColor),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Expanded(
-                  child: DropdownButtonHideUnderline(
-                    child: DropdownButton<String>(
-                      value: _chartFilter,
-                      isExpanded: true,
-                      dropdownColor: theme.cardColor,
-                      icon: Icon(Icons.arrow_drop_down, color: Colors.white.withOpacity(0.54)),
-                      style: TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold),
-                      items: const [
-                        DropdownMenuItem(value: 'Categoria', child: Text('RIPARTIZIONE CATEGORIE')),
-                        DropdownMenuItem(value: 'Prestazione', child: Text('RIPARTIZIONE PRESTAZIONI')),
-                        DropdownMenuItem(value: 'Fatturato vs Contante', child: Text('FATTURATO VS CONTANTE')),
-                      ],
-                      onChanged: (val) {
-                        if (val != null) {
-                          setState(() => _chartFilter = val);
-                        }
-                      },
-                    ),
-                  ),
-                ),
-                if (sortedCats.isNotEmpty)
-                  Icon(Icons.open_in_full, color: Colors.white24, size: 14),
-              ],
-            ),
-            SizedBox(height: 12),
-            Expanded(
-              child: Row(
-                children: [
-                  // Torta (non interattiva nella card)
-                  Expanded(
-                    flex: 2,
-                    child: IgnorePointer(
-                      child: PieChart(
-                        PieChartData(
-                          pieTouchData: PieTouchData(enabled: false),
-                          sectionsSpace: 2,
-                          centerSpaceRadius: 0,
-                          sections: sections,
-                        ),
-                      ),
-                    ),
-                  ),
-                  SizedBox(width: 8),
-                  // Legenda — Column invece di ListView così è sempre visibile su APK
-                  Expanded(
-                    flex: 3,
-                    child: LayoutBuilder(
-                      builder: (ctx, constraints) {
-                        // Se c'è spazio sufficiente per tutti gli item: Column statica
-                        // Se non c'è: ListView scrollabile
-                        const itemH = 22.0;
-                        final totalH = showItems * itemH;
-                        final needsScroll = totalH > constraints.maxHeight;
-
-                        final items = List.generate(showItems, (index) {
-                          final entry = sortedCats[index];
-                          final color = _categoryColors[entry.key] ?? palette[index % palette.length];
-                          final total = sortedCats.fold<double>(0, (s, e) => s + e.value);
-                          final pct = total > 0 ? (entry.value / total * 100) : 0;
-                          return Padding(
-                            padding: const EdgeInsets.only(bottom: 6),
-                            child: Row(
-                              children: [
-                                Container(
-                                  width: 10, height: 10,
-                                  decoration: BoxDecoration(color: color, shape: BoxShape.circle),
-                                ),
-                                SizedBox(width: 6),
-                                Expanded(
-                                  child: AutoScrollText(
-                                    text: entry.key,
-                                    style: TextStyle(color: Colors.white, fontSize: 10),
-                                  ),
-                                ),
-                                SizedBox(width: 4),
-                                Text(
-                                  '${CurrencyUtils.formatUI(pct, decimals: 0)}%',
-                                  style: TextStyle(color: Colors.white.withOpacity(0.54), fontSize: 10),
-                                ),
-                              ],
-                            ),
-                          );
-                        });
-
-                        if (needsScroll) {
-                          return ListView(children: items);
-                        } else {
-                          return Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: items,
-                          );
-                        }
-                      },
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  // ─── Finestra full-screen torta interattiva ────────────────────────────────
-  void _showPieChartFullScreen(
-    List<MapEntry<String, double>> sortedCats,
-    List<Color> palette,
-  ) {
-    String title;
-    if (_chartFilter == 'Prestazione') {
-      title = 'RIPARTIZIONE PRESTAZIONI';
-    } else if (_chartFilter == 'Fatturato vs Contante') {
-      title = 'FATTURATO VS CONTANTE';
-    } else {
-      title = 'RIPARTIZIONE CATEGORIE';
-    }
-
-    showDialog(
-      context: context,
-      barrierColor: Colors.black87,
-      builder: (_) => _PieChartFullScreenDialog(
-        sortedCats: sortedCats,
-        categoryColors: _categoryColors,
-        palette: palette,
-        title: title,
-        payments: _payments,
-        invoices: _invoices,
-        chartFilter: _chartFilter,
-        categoryNames: _categoryNames,
-        serviceNames: _serviceNames,
-      ),
-    );
-  }
-
-  Widget _buildListsSection(AppThemeProvider theme) {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        bool isWide = constraints.maxWidth > 800;
-        Widget movimenti = _buildRecentPayments(theme);
-        Widget scadenze = _buildUpcomingDeadlines(theme);
-        Widget fatture = _buildRecentInvoices(theme);
-
-        if (isWide) {
-          return Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Expanded(child: movimenti),
-              SizedBox(width: 16),
-              Expanded(child: scadenze),
-              SizedBox(width: 16),
-              Expanded(child: fatture),
-            ],
-          );
-        } else {
-          return Column(
-            children: [movimenti, SizedBox(height: 16), scadenze, SizedBox(height: 16), fatture],
-          );
-        }
-      },
-    );
-  }
-
-  Widget _buildRecentInvoices(AppThemeProvider theme) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: theme.cardColor,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: theme.borderColor),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'ULTIME FATTURE',
-            style: TextStyle(
-              color: Colors.white.withOpacity(0.54),
-              fontSize: 12,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          SizedBox(height: 16),
-          if (_invoices.isEmpty)
-            Center(child: Text('Nessuna fattura registrata', style: TextStyle(color: Colors.white.withOpacity(0.54)))),
-          ..._invoices.take(5).map((inv) {
-            String status = inv['status']?.toString() ?? '';
-            String displayStatus = status == 'PAID' ? 'Incassata' : status == 'LATE' ? 'In Ritardo' : 'Da Incassare';
-            Color statusColor = status == 'PAID' ? Colors.greenAccent : status == 'LATE' ? Colors.redAccent : Colors.orangeAccent;
-            
-            return Padding(
-              padding: const EdgeInsets.only(bottom: 12),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(inv['number']?.toString() ?? 'Senza Numero', 
-                          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        SizedBox(height: 4),
-                        Text(
-                          displayStatus,
-                          style: TextStyle(color: statusColor, fontSize: 12),
-                        ),
-                      ],
-                    ),
-                  ),
-                  Text(
-                    '€ ${inv['amount']?.toString() ?? '0.00'}',
-                    style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
-                  ),
-                ],
-              ),
-            );
-          }),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildRecentPayments(AppThemeProvider theme) {
-    // Ordina per data discendente (ultimi prima)
-    final sortedPayments = List<Map<String, dynamic>>.from(_payments)
-      ..sort((a, b) {
-        final da = a['date']?.toString() ?? '';
-        final db = b['date']?.toString() ?? '';
-        final comp = db.compareTo(da);
-        if (comp != 0) return comp;
-        final idA = int.tryParse(a['id']?.toString() ?? '0') ?? 0;
-        final idB = int.tryParse(b['id']?.toString() ?? '0') ?? 0;
-        return idB.compareTo(idA);
-      });
-
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: theme.cardColor,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: theme.borderColor),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'ULTIMI MOVIMENTI',
-            style: TextStyle(
-              color: Colors.white.withOpacity(0.54),
-              fontSize: 12,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          SizedBox(height: 16),
-          if (sortedPayments.isEmpty)
-            Text(
-              'Nessun movimento.',
-              style: TextStyle(color: Colors.white.withOpacity(0.54)),
-            )
-          else
-            ...sortedPayments.take(5).map((p) {
-              bool isIN = p['type'] == 'IN';
-              final customerName = p['customer_name']?.toString() ?? '';
-              final serviceName = p['service_name']?.toString() ?? '';
-              final subtitle = [p['date'], if (customerName.isNotEmpty) customerName, if (serviceName.isNotEmpty) serviceName].join(' • ');
-              return Padding(
-                padding: const EdgeInsets.only(bottom: 12.0),
-                child: Row(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                        color: (isIN ? Colors.greenAccent : Colors.redAccent)
-                            .withValues(alpha: 0.1),
-                        shape: BoxShape.circle,
-                      ),
-                      child: Icon(
-                        isIN ? Icons.arrow_downward : Icons.arrow_upward,
-                        color: isIN ? Colors.greenAccent : Colors.redAccent,
-                        size: 16,
-                      ),
-                    ),
-                    SizedBox(width: 12),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            p['payment_method'] ?? (isIN ? 'Incasso' : 'Spesa'),
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 14,
-                            ),
-                          ),
-                          Text(
-                            subtitle,
-                            style: TextStyle(
-                              color: Colors.white.withOpacity(0.54),
-                              fontSize: 11,
-                            ),
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ],
-                      ),
-                    ),
-                    Text(
-                      CurrencyUtils.formatEuro(p['amount']),
-                      style: TextStyle(
-                        color: isIN ? Colors.greenAccent : Colors.white,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 14,
-                      ),
-                    ),
-                  ],
-                ),
-              );
-            }),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildUpcomingDeadlines(AppThemeProvider theme) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: theme.cardColor,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: theme.borderColor),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'SCADENZE IN ARRIVO',
-            style: TextStyle(
-              color: Colors.white.withOpacity(0.54),
-              fontSize: 12,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          SizedBox(height: 16),
-          if (_deadlines.isEmpty)
-            Text(
-              'Nessuna scadenza a breve.',
-              style: TextStyle(color: Colors.white.withOpacity(0.54)),
-            )
-          else
-            ..._deadlines.take(5).map((d) {
-              return Padding(
-                padding: const EdgeInsets.only(bottom: 12.0),
-                child: Row(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                        color: Colors.orangeAccent.withValues(alpha: 0.1),
-                        shape: BoxShape.circle,
-                      ),
-                      child: Icon(
-                        Icons.event_note,
-                        color: Colors.orangeAccent,
-                        size: 16,
-                      ),
-                    ),
-                    SizedBox(width: 12),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            d['title'],
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 14,
-                            ),
-                          ),
-                          Text(
-                            d['date'],
-                            style: TextStyle(
-                              color: Colors.white.withOpacity(0.54),
-                              fontSize: 12,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    Text(
-                      CurrencyUtils.formatEuro(d['amount']),
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 14,
-                      ),
-                    ),
-                  ],
-                ),
-              );
-            }),
-        ],
-      ),
-    );
-  }
 }
 
 class AutoScrollText extends StatelessWidget {
@@ -1220,10 +492,7 @@ class AutoScrollText extends StatelessWidget {
   }
 }
 
-Color _darkenColor(Color c, [double amount = 0.25]) {
-  final hsl = HSLColor.fromColor(c);
-  return hsl.withLightness((hsl.lightness - amount).clamp(0.0, 1.0)).toColor();
-}
+
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // Dialogo full-screen torta interattiva
@@ -1328,7 +597,7 @@ class _PieChartFullScreenDialogState extends State<_PieChartFullScreenDialog>
                         color: Colors.white10,
                         borderRadius: BorderRadius.circular(8),
                       ),
-                      child: Icon(Icons.pie_chart, color: Colors.blueAccent, size: 20),
+                      child: Icon(Icons.pie_chart, color: Theme.of(context).colorScheme.primary, size: 20),
                     ),
                     SizedBox(width: 12),
                     Expanded(
@@ -1343,7 +612,7 @@ class _PieChartFullScreenDialogState extends State<_PieChartFullScreenDialog>
                       ),
                     ),
                     IconButton(
-                      icon: Icon(Icons.close, color: Colors.white.withOpacity(0.54)),
+                      icon: Icon(Icons.close, color: Colors.white.withValues(alpha: 0.54)),
                       onPressed: () => Navigator.pop(context),
                     ),
                   ],
@@ -1377,43 +646,6 @@ class _PieChartFullScreenDialogState extends State<_PieChartFullScreenDialog>
                       final color = _colorFor(i);
                       final isSelected = i == _selectedIndex;
                       final pct = total > 0 ? (entry.value / total * 100) : 0.0;
-                      final badgeSize = pct > 10 ? 36.0 : (pct > 4 ? 24.0 : 18.0);
-                      
-                      IconData getIconForCategory(String category) {
-                        final c = category.toLowerCase();
-                        if (c.contains('acquisti') || c.contains('spes') || c.contains('uscit') || c.contains('costi')) return Icons.shopping_cart;
-                        if (c.contains('incass') || c.contains('entrat') || c.contains('vendit') || c.contains('ricavi')) return Icons.attach_money;
-                        if (c.contains('tass') || c.contains('impost') || c.contains('iva')) return Icons.account_balance;
-                        if (c.contains('personale') || c.contains('dipendent') || c.contains('stipendi')) return Icons.people;
-                        if (c.contains('bollett') || c.contains('utenze') || c.contains('luce') || c.contains('gas')) return Icons.lightbulb;
-                        if (c.contains('affitt') || c.contains('locazion')) return Icons.home;
-                        if (c.contains('manutenzion') || c.contains('riparazion')) return Icons.build;
-                        if (c.contains('banca') || c.contains('commission') || c.contains('finanz')) return Icons.account_balance_wallet;
-                        if (c.contains('auto') || c.contains('trasport') || c.contains('carburant') || c.contains('viaggi')) return Icons.directions_car;
-                        if (c.contains('ristorant') || c.contains('past') || c.contains('vitto')) return Icons.restaurant;
-                        if (c.contains('assicu') || c.contains('polizz')) return Icons.security;
-                        if (c.contains('telefon') || c.contains('internet')) return Icons.phone_android;
-                        if (c.contains('softwar') || c.contains('abbonament') || c.contains('licenz')) return Icons.computer;
-                        if (c.contains('cancell') || c.contains('ufficio')) return Icons.print;
-                        return Icons.category;
-                      }
-
-                      Widget buildBadge(IconData icon, double size) {
-                        return Container(
-                          width: size,
-                          height: size,
-                          decoration: const BoxDecoration(
-                            color: Colors.white,
-                            shape: BoxShape.circle,
-                            boxShadow: [
-                              BoxShadow(color: Colors.black26, blurRadius: 4, offset: Offset(0, 2))
-                            ]
-                          ),
-                          child: Icon(icon, size: size * 0.6, color: Colors.black87),
-                        );
-                      }
-
-                      final textColor = color.computeLuminance() > 0.5 ? Colors.black : Colors.white;
 
                       return PieChartSectionData(
                         color: isSelected ? color : color.withValues(alpha: 0.75),
@@ -1511,7 +743,7 @@ class _PieChartFullScreenDialogState extends State<_PieChartFullScreenDialog>
                                     child: Row(
                                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                       children: [
-                                        Text('Totale', style: TextStyle(color: Colors.white.withOpacity(0.54), fontSize: 13)),
+                                        Text('Totale', style: TextStyle(color: Colors.white.withValues(alpha: 0.54), fontSize: 13)),
                                         Text(
                                           CurrencyUtils.formatEuro(selected.value),
                                           style: TextStyle(
@@ -1535,7 +767,7 @@ class _PieChartFullScreenDialogState extends State<_PieChartFullScreenDialog>
                                     child: Row(
                                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                       children: [
-                                        Text('% sul totale', style: TextStyle(color: Colors.white.withOpacity(0.54), fontSize: 13)),
+                                        Text('% sul totale', style: TextStyle(color: Colors.white.withValues(alpha: 0.54), fontSize: 13)),
                                         Text(
                                           '${CurrencyUtils.formatUI(selectedPct, decimals: 1)}%',
                                           style: TextStyle(
@@ -1552,65 +784,14 @@ class _PieChartFullScreenDialogState extends State<_PieChartFullScreenDialog>
                                   const Divider(color: Colors.white12),
                                   SizedBox(height: 8),
                                   Text(
-                                    selected != null 
-                                      ? 'TRANSAZIONI: ${selected.key.toUpperCase()}'
-                                      : 'RIEPILOGO TUTTE LE CATEGORIE',
+                                    'TRANSAZIONI: ${selected.key.toUpperCase()}',
                                     style: TextStyle(color: Colors.white38, fontSize: 10, fontWeight: FontWeight.bold),
                                   ),
                                   SizedBox(height: 10),
 
                                   // Lista (Categorie o Transazioni filtrate)
                                   Expanded(
-                                    child: selected != null 
-                                      ? _buildFilteredTransactionsList(selected.key, selectedColor)
-                                      : ListView.builder(
-                                          itemCount: widget.sortedCats.length,
-                                          itemBuilder: (_, idx) {
-                                            final e = widget.sortedCats[idx];
-                                            final c = _colorFor(idx);
-                                            final pct = total > 0 ? (e.value / total * 100) : 0.0;
-                                            return Container(
-                                              margin: const EdgeInsets.only(bottom: 6),
-                                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-                                              decoration: BoxDecoration(
-                                                color: Colors.white.withValues(alpha: 0.04),
-                                                borderRadius: BorderRadius.circular(8),
-                                              ),
-                                              child: Row(
-                                                children: [
-                                                  Container(
-                                                    width: 10, height: 10,
-                                                    decoration: BoxDecoration(color: c, shape: BoxShape.circle),
-                                                  ),
-                                                  SizedBox(width: 8),
-                                                  Expanded(
-                                                    child: Text(
-                                                      e.key,
-                                                      style: TextStyle(
-                                                        color: Colors.white70,
-                                                        fontSize: 12,
-                                                      ),
-                                                      overflow: TextOverflow.ellipsis,
-                                                    ),
-                                                  ),
-                                                  SizedBox(width: 8),
-                                                  Text(
-                                                    CurrencyUtils.formatEuro(e.value),
-                                                    style: TextStyle(
-                                                      color: Colors.white54,
-                                                      fontSize: 11,
-                                                    ),
-                                                  ),
-                                                  SizedBox(width: 6),
-                                                  Text(
-                                                    '${CurrencyUtils.formatUI(pct, decimals: 0)}%',
-                                                    style: TextStyle(color: Colors.white38, fontSize: 10),
-                                                  ),
-                                                ],
-                                              ),
-                                            );
-                                          },
-                                        ),
+                                    child: _buildFilteredTransactionsList(selected.key, selectedColor),
                                   ),
                                 ],
                               ),

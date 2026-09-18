@@ -37,7 +37,7 @@ class SecurityUtils {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Icon(Icons.security, color: Colors.blueAccent, size: 48),
+                    Icon(Icons.security, color: Theme.of(context).colorScheme.primary, size: 48),
                     const SizedBox(height: 16),
                     const Text(
                       'Accesso Amministratore',
@@ -58,7 +58,7 @@ class SecurityUtils {
                         labelText: 'Password Admin',
                         labelStyle: const TextStyle(color: Colors.white70),
                         enabledBorder: const UnderlineInputBorder(borderSide: BorderSide(color: Colors.white38)),
-                        focusedBorder: const UnderlineInputBorder(borderSide: BorderSide(color: Colors.blueAccent)),
+                        focusedBorder: UnderlineInputBorder(borderSide: BorderSide(color: Theme.of(context).colorScheme.primary)),
                         suffixIcon: IconButton(
                           icon: Icon(isObscure ? Icons.visibility : Icons.visibility_off, color: Colors.white54),
                           onPressed: () {
@@ -117,4 +117,3 @@ class SecurityUtils {
     ) ?? false;
   }
 }
-

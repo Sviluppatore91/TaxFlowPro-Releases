@@ -111,7 +111,7 @@ class _UpdateDialogState extends State<UpdateDialog> {
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       title: Row(
         children: [
-          const Icon(Icons.system_update, color: Colors.blueAccent),
+          Icon(Icons.system_update, color: Theme.of(context).colorScheme.primary),
           const SizedBox(width: 10),
           Expanded(
             child: Text(
@@ -134,13 +134,13 @@ class _UpdateDialogState extends State<UpdateDialog> {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
               decoration: BoxDecoration(
-                color: Colors.blueAccent.withValues(alpha: 0.15),
+                color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.15),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Text(
                 '🆕 Versione $versionName',
-                style: const TextStyle(
-                    color: Colors.blueAccent, fontWeight: FontWeight.bold),
+                style: TextStyle(
+                    color: Theme.of(context).colorScheme.primary, fontWeight: FontWeight.bold),
               ),
             ),
 
@@ -163,20 +163,20 @@ class _UpdateDialogState extends State<UpdateDialog> {
               Container(
                 padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
-                  color: Colors.blueAccent.withValues(alpha: 0.08),
+                  color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.08),
                   borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: Colors.blueAccent.withValues(alpha: 0.2)),
+                  border: Border.all(color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.2)),
                 ),
-                child: const Column(
+                child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Row(
                       children: [
-                        Icon(Icons.laptop_windows, color: Colors.blueAccent, size: 16),
+                        Icon(Icons.laptop_windows, color: Theme.of(context).colorScheme.primary, size: 16),
                         SizedBox(width: 6),
                         Text('Aggiornamento PC',
                             style: TextStyle(
-                                color: Colors.blueAccent,
+                                color: Theme.of(context).colorScheme.primary,
                                 fontWeight: FontWeight.bold,
                                 fontSize: 13)),
                       ],
@@ -207,7 +207,7 @@ class _UpdateDialogState extends State<UpdateDialog> {
                   value: _progress > 0 ? _progress : null,
                   backgroundColor: Colors.white12,
                   valueColor:
-                      const AlwaysStoppedAnimation<Color>(Colors.blueAccent),
+                      AlwaysStoppedAnimation<Color>(Theme.of(context).colorScheme.primary),
                   minHeight: 6,
                 ),
               ),
@@ -281,10 +281,10 @@ class _UpdateDialogState extends State<UpdateDialog> {
         if (_hasError && _downloadUrl.isNotEmpty)
           TextButton.icon(
             onPressed: _openInBrowser,
-            icon: const Icon(Icons.open_in_browser,
-                size: 16, color: Colors.blueAccent),
-            label: const Text('Scarica dal Browser',
-                style: TextStyle(color: Colors.blueAccent)),
+            icon: Icon(Icons.open_in_browser,
+                size: 16, color: Theme.of(context).colorScheme.primary),
+            label: Text('Scarica dal Browser',
+                style: TextStyle(color: Theme.of(context).colorScheme.primary)),
           ),
 
         // Pulsante principale Windows: apre browser direttamente
@@ -293,7 +293,7 @@ class _UpdateDialogState extends State<UpdateDialog> {
             icon: const Icon(Icons.download, size: 16),
             label: const Text('Scarica Aggiornamento'),
             style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.blueAccent,
+              backgroundColor: Theme.of(context).colorScheme.primary,
               foregroundColor: Colors.white,
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8)),
@@ -307,7 +307,7 @@ class _UpdateDialogState extends State<UpdateDialog> {
             icon: const Icon(Icons.download, size: 16),
             label: const Text('Aggiorna Ora'),
             style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.blueAccent,
+              backgroundColor: Theme.of(context).colorScheme.primary,
               foregroundColor: Colors.white,
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8)),
@@ -321,7 +321,7 @@ class _UpdateDialogState extends State<UpdateDialog> {
             icon: const Icon(Icons.refresh, size: 16),
             label: const Text('Riprova'),
             style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.blueAccent,
+              backgroundColor: Theme.of(context).colorScheme.primary,
               foregroundColor: Colors.white,
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8)),

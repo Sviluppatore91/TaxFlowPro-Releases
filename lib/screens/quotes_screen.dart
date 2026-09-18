@@ -6,7 +6,8 @@ import 'package:url_launcher/url_launcher.dart';
 import '../providers/app_theme_provider.dart';
 import '../database/database_helper.dart';
 import '../services/attachment_service.dart';
-import '../utils/security_utils.dart';
+import '../widgets/quote_table_row.dart';
+import '../widgets/glass_container.dart';
 
 class QuotesScreen extends StatefulWidget {
   const QuotesScreen({super.key});
@@ -110,17 +111,17 @@ class _QuotesScreenState extends State<QuotesScreen> {
           style: TextStyle(color: Colors.white),
           decoration: InputDecoration(
             labelText: 'Numero Seriale',
-            labelStyle: TextStyle(color: Colors.white.withOpacity(0.54)),
+            labelStyle: TextStyle(color: Colors.white.withValues(alpha: 0.54)),
           ),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx, null),
-            child: Text('Annulla', style: TextStyle(color: Colors.white.withOpacity(0.54))),
+            child: Text('Annulla', style: TextStyle(color: Colors.white.withValues(alpha: 0.54))),
           ),
           TextButton(
             onPressed: () => Navigator.pop(ctx, tc.text),
-            child: Text('Salva', style: TextStyle(color: Colors.blueAccent)),
+            child: Text('Salva', style: TextStyle(color: Theme.of(context).colorScheme.primary)),
           ),
         ],
       ),
@@ -146,11 +147,11 @@ class _QuotesScreenState extends State<QuotesScreen> {
       builder: (ctx) => AlertDialog(
         backgroundColor: const Color(0xFF1E1E24),
         title: Text('Elimina', style: TextStyle(color: Colors.white)),
-        content: Text('Eliminare questo preventivo?', style: TextStyle(color: Colors.white.withOpacity(0.7))),
+        content: Text('Eliminare questo preventivo?', style: TextStyle(color: Colors.white.withValues(alpha: 0.7))),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx, false),
-            child: Text('Annulla', style: TextStyle(color: Colors.white.withOpacity(0.54))),
+            child: Text('Annulla', style: TextStyle(color: Colors.white.withValues(alpha: 0.54))),
           ),
           TextButton(
             onPressed: () => Navigator.pop(ctx, true),
@@ -204,94 +205,78 @@ class _QuotesScreenState extends State<QuotesScreen> {
         child: Icon(Icons.upload_file, color: Colors.white),
       ),
       body: _isLoading
-          ? Center(child: CircularProgressIndicator(color: Colors.blueAccent))
-          : _quotes.isEmpty
-              ? Center(
-                  child: Text('Nessun preventivo presente.', style: TextStyle(color: Colors.white.withOpacity(0.7))),
-                )
-              : ListView.builder(
-                  padding: const EdgeInsets.all(16),
-                  itemCount: _quotes.length,
-                  itemBuilder: (context, index) {
-                    final quote = _quotes[index];
-                    final isAccepted = quote['accepted'] == true;
-                    final isRejected = quote['rejected'] == true;
-
-                    return Container(
-                      margin: const EdgeInsets.only(bottom: 12),
-                      decoration: BoxDecoration(
-                        color: theme.cardColor,
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(color: theme.borderColor),
-                      ),
-                      child: Column(
+          ? Center(child: CircularProgressIndicator(color: Theme.of(context).colorScheme.primary))
+          : Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: GlassContainer(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(24.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          ListTile(
-                            leading: InkWell(
-                              onTap: () => _editSerialNumber(quote),
-                              child: Container(
-                                padding: const EdgeInsets.all(8),
-                                decoration: BoxDecoration(
-                                  color: theme.primaryColor.withOpacity(0.2),
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                                child: Text(
-                                  '#${quote['serial_number'] ?? '0'}',
-                                  style: TextStyle(
-                                    color: theme.primaryColor,
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 16,
-                                  ),
-                                ),
-                              ),
-                            ),
-                            title: InkWell(
-                              onTap: () => _openFile(quote['file_url'] ?? ''),
-                              child: Text(
-                                quote['file_name'] ?? 'Sconosciuto',
-                                style: TextStyle(
-                                  color: Colors.blueAccent,
-                                  decoration: TextDecoration.underline,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ),
-                            trailing: IconButton(
-                              icon: Icon(Icons.delete_outline, color: Colors.redAccent),
-                              onPressed: () => _deleteQuote(quote['id']),
+                          Text(
+                            'Riepilogo Preventivi',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
                             ),
                           ),
-                          Padding(
-                            padding: const EdgeInsets.only(left: 16, right: 16, bottom: 12),
-                            child: SingleChildScrollView(
-                              scrollDirection: Axis.horizontal,
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                children: [
-                                  Checkbox(
-                                    value: isAccepted,
-                                    onChanged: (val) => _updateQuoteState(quote, accepted: val ?? false, rejected: false),
-                                    activeColor: Colors.greenAccent,
-                                    checkColor: Colors.black,
-                                  ),
-                                  Text('Accettato', style: TextStyle(color: Colors.white.withOpacity(0.7))),
-                                  SizedBox(width: 16),
-                                  Checkbox(
-                                    value: isRejected,
-                                    onChanged: (val) => _updateQuoteState(quote, accepted: false, rejected: val ?? false),
-                                    activeColor: Colors.redAccent,
-                                    checkColor: Colors.white,
-                                  ),
-                                  Text('Non Accettato', style: TextStyle(color: Colors.white.withOpacity(0.7))),
-                                ],
-                              ),
-                            ),
-                          ),
+                          Icon(Icons.more_horiz, color: Colors.white.withValues(alpha: 0.5)),
                         ],
                       ),
-                    );
-                  },
+                    ),
+                    // Table Header
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                      decoration: BoxDecoration(
+                        border: Border(
+                          bottom: BorderSide(color: Colors.white.withValues(alpha: 0.1)),
+                          top: BorderSide(color: Colors.white.withValues(alpha: 0.1)),
+                        ),
+                      ),
+                      child: Row(
+                        children: [
+                          const SizedBox(width: 40), // For checkbox
+                          Expanded(flex: 2, child: Text('ID Preventivo', style: TextStyle(color: Colors.white.withValues(alpha: 0.7), fontSize: 12))),
+                          Expanded(flex: 3, child: Text('Nome File', style: TextStyle(color: Colors.white.withValues(alpha: 0.7), fontSize: 12))),
+                          Expanded(flex: 2, child: Text('Data', style: TextStyle(color: Colors.white.withValues(alpha: 0.7), fontSize: 12))),
+                          Expanded(flex: 2, child: Text('Stato', style: TextStyle(color: Colors.white.withValues(alpha: 0.7), fontSize: 12))),
+                          Expanded(flex: 4, child: Align(alignment: Alignment.centerRight, child: Text('Azioni', style: TextStyle(color: Colors.white.withValues(alpha: 0.7), fontSize: 12)))),
+                        ],
+                      ),
+                    ),
+                    // Table Rows
+                    Expanded(
+                      child: _quotes.isEmpty
+                          ? Center(
+                              child: Text('Nessun preventivo presente.', style: TextStyle(color: Colors.white.withValues(alpha: 0.7))),
+                            )
+                          : ListView.builder(
+                              itemCount: _quotes.length,
+                              itemBuilder: (context, index) {
+                                final quote = _quotes[index];
+                                final isAccepted = quote['accepted'] == true;
+
+                                return QuoteTableRow(
+                                  quote: quote,
+                                  isSelected: isAccepted,
+                                  onTap: () => _editSerialNumber(quote),
+                                  onDownload: () => _openFile(quote['file_url'] ?? ''),
+                                  onDelete: () => _deleteQuote(quote['id']),
+                                  onAccept: () => _updateQuoteState(quote, accepted: true, rejected: false),
+                                  onReject: () => _updateQuoteState(quote, accepted: false, rejected: true),
+                                );
+                              },
+                            ),
+                    ),
+                  ],
                 ),
+              ),
+            ),
     );
   }
 }

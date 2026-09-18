@@ -1,3 +1,4 @@
+import 'package:tax_flow_pro/utils/logger.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'dart:io';
@@ -13,7 +14,7 @@ class MigrationHelper {
     final db = await openDatabase(dbPath);
     final firestore = FirebaseFirestore.instance;
 
-    print('Inizio migrazione Customers...');
+    appLogger.i('Inizio migrazione Customers...');
     try {
       final customers = await db.query('customers');
       for (var c in customers) {
@@ -25,7 +26,7 @@ class MigrationHelper {
       errors.add('Errore customers: $e');
     }
 
-    print('Inizio migrazione Categories...');
+    appLogger.i('Inizio migrazione Categories...');
     try {
       final categories = await db.query('categories');
       for (var c in categories) {
@@ -37,7 +38,7 @@ class MigrationHelper {
       errors.add('Errore categories: $e');
     }
 
-    print('Inizio migrazione Service Types...');
+    appLogger.i('Inizio migrazione Service Types...');
     try {
       final services = await db.query('service_types');
       for (var s in services) {
@@ -49,7 +50,7 @@ class MigrationHelper {
       errors.add('Errore service_types: $e');
     }
 
-    print('Inizio migrazione Payments...');
+    appLogger.i('Inizio migrazione Payments...');
     try {
       final payments = await db.query('payments');
       for (var p in payments) {
@@ -65,7 +66,7 @@ class MigrationHelper {
       errors.add('Errore payments: $e');
     }
 
-    print('Inizio migrazione Users...');
+    appLogger.i('Inizio migrazione Users...');
     try {
       final users = await db.query('users');
       for (var u in users) {

@@ -79,7 +79,7 @@ class CurrencyUtils {
       int count = 0;
       for (int i = intPart.length - 1; i >= 0; i--) {
         if (count > 0 && count % 3 == 0) {
-          formattedInt = '.' + formattedInt;
+          formattedInt = '.$formattedInt';
         }
         formattedInt = intPart[i] + formattedInt;
         count++;
@@ -89,7 +89,7 @@ class CurrencyUtils {
     
     String result = decPart.isNotEmpty ? '$intPart,$decPart' : intPart;
     if (isNegative) {
-      result = '-' + result;
+      result = '-$result';
     }
     return result;
   }

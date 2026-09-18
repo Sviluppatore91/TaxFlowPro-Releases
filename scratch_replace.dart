@@ -13,7 +13,7 @@ void main() {
       try {
         content = file.readAsStringSync(encoding: latin1);
       } catch (e) {
-        print("Failed to read ${file.path}");
+        // print("Failed to read ${file.path}");
         continue;
       }
     }
@@ -77,7 +77,7 @@ void main() {
       }
 
       file.writeAsStringSync(content, encoding: utf8);
-      print("Updated ${file.path}");
+      // print("Updated ${file.path}");
     }
   }
 }

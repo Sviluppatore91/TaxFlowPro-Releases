@@ -108,7 +108,7 @@ class DeadlinesSelectionScreen extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(icon, size: 64, color: Colors.blueAccent),
+              Icon(icon, size: 64, color: Theme.of(context).colorScheme.primary),
               SizedBox(height: 16),
               Text(
                 title,
@@ -124,7 +124,7 @@ class DeadlinesSelectionScreen extends StatelessWidget {
                 description,
                 textAlign: TextAlign.center,
                 style: TextStyle(
-                  color: Colors.white.withOpacity(0.54),
+                  color: Colors.white.withValues(alpha: 0.54),
                   fontSize: 14,
                 ),
               ),

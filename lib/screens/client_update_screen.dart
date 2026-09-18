@@ -1,3 +1,4 @@
+import 'package:tax_flow_pro/utils/logger.dart';
 import 'package:flutter/material.dart';
 import 'package:audioplayers/audioplayers.dart';
 import '../services/update_service.dart';
@@ -29,7 +30,7 @@ class _ClientUpdateScreenState extends State<ClientUpdateScreen> {
     try {
       await _audioPlayer.play(AssetSource('audio/blimp.wav'));
     } catch (e) {
-      print("Errore riproduzione suono: $e");
+      appLogger.e("Errore riproduzione suono: $e");
     }
   }
 
@@ -87,7 +88,7 @@ class _ClientUpdateScreenState extends State<ClientUpdateScreen> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(Icons.system_update_alt, size: 80, color: Colors.blueAccent),
+              Icon(Icons.system_update_alt, size: 80, color: Theme.of(context).colorScheme.primary),
               SizedBox(height: 24),
               Text(
                 "Nuova versione trovata: ${widget.updateData['versionName']}",

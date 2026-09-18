@@ -339,11 +339,11 @@ class _PaymentFormScreenState extends State<PaymentFormScreen> {
       builder: (ctx) => AlertDialog(
         backgroundColor: const Color(0xFF1E1E24),
         title: Text('Elimina', style: TextStyle(color: Colors.black)),
-        content: Text('Sei sicuro di voler eliminare questo movimento?', style: TextStyle(color: Colors.white.withOpacity(0.7))),
+        content: Text('Sei sicuro di voler eliminare questo movimento?', style: TextStyle(color: Colors.white.withValues(alpha: 0.7))),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx, false),
-            child: Text('Annulla', style: TextStyle(color: Colors.white.withOpacity(0.54))),
+            child: Text('Annulla', style: TextStyle(color: Colors.white.withValues(alpha: 0.54))),
           ),
           TextButton(
             onPressed: () => Navigator.pop(ctx, true),
@@ -407,14 +407,14 @@ class _PaymentFormScreenState extends State<PaymentFormScreen> {
         actions: [
           if (widget.paymentId != null && widget.isReadOnly)
             IconButton(
-              icon: Icon(Icons.edit_outlined, color: Colors.blueAccent),
+              icon: Icon(Icons.edit_outlined, color: Theme.of(context).colorScheme.primary),
               tooltip: 'Modifica',
               onPressed: () async {
                 final auth = await SecurityUtils.requireAdminAuth(context);
-                if (auth && mounted) {
-                  final ctx = context;
+                if (auth) {
+                  if (!mounted) return;
                   Navigator.pushReplacement(
-                    ctx,
+                    context,
                     MaterialPageRoute(
                       builder: (_) => PaymentFormScreen(paymentId: widget.paymentId, isReadOnly: false, isScheduled: widget.isScheduled),
                     ),
@@ -469,8 +469,8 @@ class _PaymentFormScreenState extends State<PaymentFormScreen> {
                         labelText: 'Importo (es. 100.50)',
                         prefixText: '€ ',
                         prefixStyle: TextStyle(color: Colors.white),
-                        labelStyle: TextStyle(color: Colors.white.withOpacity(0.7)),
-                        enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: Colors.white.withOpacity(0.7))),
+                        labelStyle: TextStyle(color: Colors.white.withValues(alpha: 0.7)),
+                        enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.7))),
                       ),
                     ),
                     SizedBox(height: 16),
@@ -486,9 +486,9 @@ class _PaymentFormScreenState extends State<PaymentFormScreen> {
                                   style: TextStyle(color: Colors.white),
                                   decoration: InputDecoration(
                                     labelText: 'Data da',
-                                    labelStyle: TextStyle(color: Colors.white.withOpacity(0.7)),
-                                    enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: Colors.white.withOpacity(0.7))),
-                                    suffixIcon: Icon(Icons.calendar_today, color: Colors.white.withOpacity(0.7)),
+                                    labelStyle: TextStyle(color: Colors.white.withValues(alpha: 0.7)),
+                                    enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.7))),
+                                    suffixIcon: Icon(Icons.calendar_today, color: Colors.white.withValues(alpha: 0.7)),
                                   ),
                                 ),
                               ),
@@ -506,14 +506,14 @@ class _PaymentFormScreenState extends State<PaymentFormScreen> {
                                   style: TextStyle(color: Colors.white),
                                   decoration: InputDecoration(
                                     labelText: 'Data a (opz.)',
-                                    labelStyle: TextStyle(color: Colors.white.withOpacity(0.7)),
-                                    enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: Colors.white.withOpacity(0.7))),
+                                    labelStyle: TextStyle(color: Colors.white.withValues(alpha: 0.7)),
+                                    enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.7))),
                                     suffixIcon: _dateTo != null 
                                       ? GestureDetector(
                                           onTap: () => setState(() => _dateTo = null),
                                           child: Icon(Icons.clear, color: Colors.white54),
                                         )
-                                      : Icon(Icons.calendar_today, color: Colors.white.withOpacity(0.7)),
+                                      : Icon(Icons.calendar_today, color: Colors.white.withValues(alpha: 0.7)),
                                   ),
                                 ),
                               ),
@@ -523,12 +523,12 @@ class _PaymentFormScreenState extends State<PaymentFormScreen> {
                       ),
                       SizedBox(height: 16),
                       DropdownButtonFormField<String>(
-                        value: _status,
+                        initialValue: _status,
                         dropdownColor: const Color(0xFF2A2D34),
                         decoration: InputDecoration(
                           labelText: 'Stato',
-                          labelStyle: TextStyle(color: Colors.white.withOpacity(0.7)),
-                          enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: Colors.white.withOpacity(0.7))),
+                          labelStyle: TextStyle(color: Colors.white.withValues(alpha: 0.7)),
+                          enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.7))),
                         ),
                         items: const [
                           DropdownMenuItem(value: 'PENDING', child: Text('⏳ Da Pagare', style: TextStyle(color: Colors.white))),
@@ -547,9 +547,9 @@ class _PaymentFormScreenState extends State<PaymentFormScreen> {
                             style: TextStyle(color: Colors.white),
                             decoration: InputDecoration(
                               labelText: 'Data',
-                              labelStyle: TextStyle(color: Colors.white.withOpacity(0.7)),
-                              enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: Colors.white.withOpacity(0.7))),
-                              suffixIcon: Icon(Icons.calendar_today, color: Colors.white.withOpacity(0.7)),
+                              labelStyle: TextStyle(color: Colors.white.withValues(alpha: 0.7)),
+                              enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.7))),
+                              suffixIcon: Icon(Icons.calendar_today, color: Colors.white.withValues(alpha: 0.7)),
                             ),
                           ),
                         ),
@@ -576,8 +576,8 @@ class _PaymentFormScreenState extends State<PaymentFormScreen> {
                       decoratorProps: DropDownDecoratorProps(
                         decoration: InputDecoration(
                           labelText: 'Metodo',
-                          labelStyle: TextStyle(color: Colors.white.withOpacity(0.7)),
-                          enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: Colors.white.withOpacity(0.7))),
+                          labelStyle: TextStyle(color: Colors.white.withValues(alpha: 0.7)),
+                          enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.7))),
                         ),
                       ),
                       onSelected: (String? val) {
@@ -600,7 +600,7 @@ class _PaymentFormScreenState extends State<PaymentFormScreen> {
               if (_isUploading)
                 Padding(
                   padding: EdgeInsets.symmetric(vertical: 8.0),
-                  child: Center(child: CircularProgressIndicator(color: Colors.blueAccent)),
+                  child: Center(child: CircularProgressIndicator(color: Theme.of(context).colorScheme.primary)),
                 ),
               if (_attachments.isNotEmpty)
                 Padding(
@@ -608,7 +608,7 @@ class _PaymentFormScreenState extends State<PaymentFormScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text('Allegati:', style: TextStyle(color: Colors.white.withOpacity(0.7), fontWeight: FontWeight.bold)),
+                      Text('Allegati:', style: TextStyle(color: Colors.white.withValues(alpha: 0.7), fontWeight: FontWeight.bold)),
                       SizedBox(height: 8),
                       ..._attachments.asMap().entries.map((entry) {
                         int idx = entry.key;
@@ -623,7 +623,7 @@ class _PaymentFormScreenState extends State<PaymentFormScreen> {
                           ),
                           child: Row(
                             children: [
-                              Icon(Icons.attachment, color: Colors.blueAccent, size: 24),
+                              Icon(Icons.attachment, color: Theme.of(context).colorScheme.primary, size: 24),
                               SizedBox(width: 12),
                               Expanded(
                                 child: InkWell(
@@ -631,7 +631,7 @@ class _PaymentFormScreenState extends State<PaymentFormScreen> {
                                   child: Text(
                                     'Apri Allegato ${idx + 1}',
                                     style: TextStyle(
-                                        color: Colors.blueAccent,
+                                        color: Theme.of(context).colorScheme.primary,
                                         fontWeight: FontWeight.bold,
                                         fontSize: 16,
                                         decoration: TextDecoration.underline),
@@ -693,8 +693,8 @@ class _PaymentFormScreenState extends State<PaymentFormScreen> {
                       style: TextStyle(color: Colors.white),
                       decoration: InputDecoration(
                         labelText: 'Titolo (opzionale)',
-                        labelStyle: TextStyle(color: Colors.white.withOpacity(0.7)),
-                        enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: Colors.white.withOpacity(0.7))),
+                        labelStyle: TextStyle(color: Colors.white.withValues(alpha: 0.7)),
+                        enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.7))),
                       ),
                     ),
                     SizedBox(height: 16),
@@ -719,8 +719,8 @@ class _PaymentFormScreenState extends State<PaymentFormScreen> {
                       decoratorProps: DropDownDecoratorProps(
                         decoration: InputDecoration(
                           labelText: 'Cliente (Opzionale)',
-                          labelStyle: TextStyle(color: Colors.white.withOpacity(0.7)),
-                          enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: Colors.white.withOpacity(0.7))),
+                          labelStyle: TextStyle(color: Colors.white.withValues(alpha: 0.7)),
+                          enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.7))),
                         ),
                       ),
                       onSelected: (Customer? val) {
@@ -743,8 +743,8 @@ class _PaymentFormScreenState extends State<PaymentFormScreen> {
                       style: TextStyle(color: Colors.white),
                       decoration: InputDecoration(
                         labelText: 'Cellulare Cliente',
-                        labelStyle: TextStyle(color: Colors.white.withOpacity(0.7)),
-                        enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: Colors.white.withOpacity(0.7))),
+                        labelStyle: TextStyle(color: Colors.white.withValues(alpha: 0.7)),
+                        enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.7))),
                       ),
                     ),
                     SizedBox(height: 16),
@@ -753,8 +753,8 @@ class _PaymentFormScreenState extends State<PaymentFormScreen> {
                       style: TextStyle(color: Colors.white),
                       decoration: InputDecoration(
                         labelText: 'Email Cliente',
-                        labelStyle: TextStyle(color: Colors.white.withOpacity(0.7)),
-                        enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: Colors.white.withOpacity(0.7))),
+                        labelStyle: TextStyle(color: Colors.white.withValues(alpha: 0.7)),
+                        enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.7))),
                       ),
                     ),
                     SizedBox(height: 16),
@@ -779,8 +779,8 @@ class _PaymentFormScreenState extends State<PaymentFormScreen> {
                       decoratorProps: DropDownDecoratorProps(
                         decoration: InputDecoration(
                           labelText: 'Categoria (Opzionale)',
-                          labelStyle: TextStyle(color: Colors.white.withOpacity(0.7)),
-                          enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: Colors.white.withOpacity(0.7))),
+                          labelStyle: TextStyle(color: Colors.white.withValues(alpha: 0.7)),
+                          enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.7))),
                         ),
                       ),
                       onSelected: (Category? val) => setState(() => _selectedCategoryId = val?.id),
@@ -807,8 +807,8 @@ class _PaymentFormScreenState extends State<PaymentFormScreen> {
                       decoratorProps: DropDownDecoratorProps(
                         decoration: InputDecoration(
                           labelText: 'Servizio (Opzionale)',
-                          labelStyle: TextStyle(color: Colors.white.withOpacity(0.7)),
-                          enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: Colors.white.withOpacity(0.7))),
+                          labelStyle: TextStyle(color: Colors.white.withValues(alpha: 0.7)),
+                          enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.7))),
                         ),
                       ),
                       onSelected: (ServiceType? val) => setState(() => _selectedServiceId = val?.id),
@@ -820,8 +820,8 @@ class _PaymentFormScreenState extends State<PaymentFormScreen> {
                       maxLines: 3,
                       decoration: InputDecoration(
                         labelText: 'Descrizione evento (Opzionale)',
-                        labelStyle: TextStyle(color: Colors.white.withOpacity(0.7)),
-                        enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: Colors.white.withOpacity(0.7))),
+                        labelStyle: TextStyle(color: Colors.white.withValues(alpha: 0.7)),
+                        enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.7))),
                         hintText: 'Es: Matrimonio Rossi, DJ set serata...',
                         hintStyle: TextStyle(color: Colors.white24),
                       ),
@@ -833,7 +833,7 @@ class _PaymentFormScreenState extends State<PaymentFormScreen> {
               if (!widget.isReadOnly)
                 ElevatedButton(
                   onPressed: _savePayment,
-                  style: ElevatedButton.styleFrom(padding: const EdgeInsets.symmetric(vertical: 16), backgroundColor: Colors.blueAccent, foregroundColor: Colors.white),
+                  style: ElevatedButton.styleFrom(padding: const EdgeInsets.symmetric(vertical: 16), backgroundColor: Theme.of(context).colorScheme.primary, foregroundColor: Colors.white),
                   child: Text('SALVA PAGAMENTO', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                 ),
             ],

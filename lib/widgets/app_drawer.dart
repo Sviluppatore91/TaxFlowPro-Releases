@@ -1,156 +1,230 @@
-import 'dart:io';
 import 'package:flutter/material.dart';
-import '../providers/app_theme_provider.dart';
 import 'package:provider/provider.dart';
+import '../providers/app_theme_provider.dart';
 
 class AppDrawer extends StatelessWidget {
   final int currentIndex;
   final Function(int) onItemSelected;
   final VoidCallback onLogout;
+  final bool isDesktop;
 
   const AppDrawer({
     super.key,
     required this.currentIndex,
     required this.onItemSelected,
     required this.onLogout,
+    this.isDesktop = false,
   });
 
   @override
   Widget build(BuildContext context) {
-    final theme = context.watch<AppThemeProvider>();
+    final theme = Provider.of<AppThemeProvider>(context);
 
-    return Drawer(
-      backgroundColor: const Color(0xFF1A1D24),
-      child: Column(
-        children: [
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.fromLTRB(16, 48, 16, 16),
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [
-                  const Color(0xFF3A3F4B),
-                  const Color(0xFF2A2D34),
-                  const Color(0xFF4A4F5A),
-                  const Color(0xFF2A2D34),
-                  const Color(0xFF3A3F4B),
-                ],
-                stops: const [0.0, 0.3, 0.5, 0.7, 1.0],
-              ),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.white.withOpacity(0.05),
-                  blurRadius: 12,
-                  offset: const Offset(0, 2),
-                ),
-              ],
-            ),
-            child: Row(
-              children: [
-                Container(
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    border: Border.all(color: Colors.white.withOpacity(0.3), width: 2),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.4),
-                        blurRadius: 8,
-                        offset: const Offset(0, 2),
+    Widget content = Column(
+      children: [
+        Container(
+          width: double.infinity,
+          padding: const EdgeInsets.fromLTRB(24, 48, 24, 24),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Container(
+                    width: 40,
+                    height: 40,
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF121212),
+                      borderRadius: BorderRadius.circular(10),
+                      border: Border.all(color: Theme.of(context).colorScheme.secondary.withValues(alpha: 0.5), width: 1.0),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.4),
+                          blurRadius: 10,
+                          spreadRadius: 1,
+                        )
+                      ],
+                    ),
+                    child: Center(
+                      child: Icon(Icons.blender, color: Theme.of(context).colorScheme.secondary, size: 24),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Row(
+                    children: [
+                      const Text(
+                        'BIMBO',
+                        style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w900, letterSpacing: 1.0),
+                      ),
+                      Text(
+                        'MIXER',
+                        style: TextStyle(color: theme.primaryColor, fontSize: 20, fontWeight: FontWeight.w900, letterSpacing: 1.0),
                       ),
                     ],
                   ),
-                  child: CircleAvatar(
-                    radius: 30,
-                    backgroundColor: const Color(0xFF2A2D34),
-                    child: theme.hasValidLogo
-                        ? ClipOval(
-                            child: Image.file(
-                              File(theme.logoImagePath!),
-                              width: 60,
-                              height: 60,
-                              fit: BoxFit.cover,
-                            ),
-                          )
-                        : Icon(Icons.account_balance_wallet, size: 30, color: theme.primaryColor),
-                  ),
-                ),
-                SizedBox(width: 16),
-                Expanded(
-                  child: ShaderMask(
-                    shaderCallback: (bounds) => LinearGradient(
-                      colors: [
-                        Colors.white,
-                        Colors.white.withOpacity(0.85),
-                        Colors.white,
-                      ],
-                      stops: const [0.0, 0.5, 1.0],
-                    ).createShader(bounds),
-                    child: Text(
-                      'TaxFlowPro Contabilità',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                        letterSpacing: 0.5,
-                        shadows: [
-                          Shadow(
-                            color: Colors.black.withOpacity(0.5),
-                            blurRadius: 4,
-                            offset: const Offset(0, 2),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
+                ],
+              ),
+            ],
           ),
-          Expanded(
-            child: ListView(
-              padding: EdgeInsets.zero,
-              children: [
-                _buildDrawerItem(context, 0, Icons.dashboard, 'Dashboard', theme.primaryColor),
-                _buildDrawerItem(context, 1, Icons.swap_horiz, 'Movimenti', theme.primaryColor),
-                _buildDrawerItem(context, 2, Icons.receipt, 'Fatture', theme.primaryColor),
-                _buildDrawerItem(context, 3, Icons.calendar_today, 'Scadenze', theme.primaryColor),
-                _buildDrawerItem(context, 4, Icons.note, 'Note', theme.primaryColor),
-                _buildDrawerItem(context, 5, Icons.description, 'Preventivi', theme.primaryColor),
-                _buildDrawerItem(context, 6, Icons.menu, 'Altro', theme.primaryColor),
-              ],
-            ),
+        ),
+        const SizedBox(height: 16),
+        Expanded(
+          child: ListView(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            children: [
+              _DrawerItem(
+                icon: Icons.dashboard_outlined,
+                title: 'Dashboard',
+                isSelected: currentIndex == 0,
+                onTap: () => _handleItemTap(context, 0),
+              ),
+              _DrawerItem(
+                icon: Icons.swap_horiz_outlined,
+                title: 'Movimenti',
+                isSelected: currentIndex == 1,
+                onTap: () => _handleItemTap(context, 1),
+              ),
+              _DrawerItem(
+                icon: Icons.receipt_long_outlined,
+                title: 'Fatture',
+                isSelected: currentIndex == 2,
+                onTap: () => _handleItemTap(context, 2),
+              ),
+              _DrawerItem(
+                icon: Icons.calendar_today_outlined,
+                title: 'Scadenze',
+                isSelected: currentIndex == 3,
+                onTap: () => _handleItemTap(context, 3),
+              ),
+              _DrawerItem(
+                icon: Icons.note_outlined,
+                title: 'Note',
+                isSelected: currentIndex == 4,
+                onTap: () => _handleItemTap(context, 4),
+              ),
+              _DrawerItem(
+                icon: Icons.description_outlined,
+                title: 'Preventivi',
+                isSelected: currentIndex == 5,
+                onTap: () => _handleItemTap(context, 5),
+              ),
+              _DrawerItem(
+                icon: Icons.more_horiz_outlined,
+                title: 'Altro',
+                isSelected: currentIndex == 6,
+                onTap: () => _handleItemTap(context, 6),
+              ),
+            ],
           ),
-          Divider(color: Colors.white24),
-          ListTile(
-            leading: Icon(Icons.logout, color: Colors.redAccent),
-            title: Text('Esci', style: TextStyle(color: Colors.redAccent, fontWeight: FontWeight.bold)),
+        ),
+        const Divider(color: Colors.white10),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+          child: ListTile(
+            leading: const Icon(Icons.logout, color: Colors.white54, size: 22),
+            title: const Text('Esci', style: TextStyle(color: Colors.white54, fontSize: 15, fontWeight: FontWeight.w500)),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
             onTap: onLogout,
+            hoverColor: Colors.white.withValues(alpha: 0.05),
           ),
-          SizedBox(height: 16),
-        ],
-      ),
+        ),
+      ],
+    );
+
+    if (isDesktop) {
+      return Container(
+        color: theme.scaffoldBackgroundColor,
+        child: content,
+      );
+    }
+
+    return Drawer(
+      backgroundColor: theme.scaffoldBackgroundColor,
+      child: content,
     );
   }
 
-  Widget _buildDrawerItem(BuildContext context, int index, IconData icon, String title, Color primaryColor) {
-    bool isSelected = currentIndex == index;
-    return ListTile(
-      leading: Icon(icon, color: isSelected ? primaryColor : Colors.white70),
-      title: Text(
-        title,
-        style: TextStyle(
-          color: isSelected ? primaryColor : Colors.white,
-          fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+  void _handleItemTap(BuildContext context, int index) {
+    onItemSelected(index);
+    if (!isDesktop) {
+      Navigator.pop(context); // Close the drawer on mobile
+    }
+  }
+}
+
+class _DrawerItem extends StatefulWidget {
+  final IconData icon;
+  final String title;
+  final bool isSelected;
+  final VoidCallback onTap;
+
+  const _DrawerItem({
+    required this.icon,
+    required this.title,
+    required this.isSelected,
+    required this.onTap,
+  });
+
+  @override
+  State<_DrawerItem> createState() => _DrawerItemState();
+}
+
+class _DrawerItemState extends State<_DrawerItem> {
+  bool _isHovering = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Provider.of<AppThemeProvider>(context);
+    final activeColor = theme.primaryColor;
+    final defaultColor = Colors.white54;
+    
+    final color = widget.isSelected || _isHovering ? activeColor : defaultColor;
+
+    return MouseRegion(
+      onEnter: (_) => setState(() => _isHovering = true),
+      onExit: (_) => setState(() => _isHovering = false),
+      cursor: SystemMouseCursors.click,
+      child: GestureDetector(
+        onTap: widget.onTap,
+        child: Container(
+          margin: const EdgeInsets.only(bottom: 8),
+          decoration: widget.isSelected
+              ? BoxDecoration(
+                  color: Colors.white.withValues(alpha: 0.03),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border(right: BorderSide(color: activeColor, width: 3)),
+                )
+              : BoxDecoration(
+                  color: Colors.transparent,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          child: Row(
+            children: [
+              Icon(
+                widget.icon,
+                color: color,
+                size: 22,
+                shadows: _isHovering || widget.isSelected
+                    ? [Shadow(color: color, blurRadius: 10)]
+                    : null,
+              ),
+              const SizedBox(width: 16),
+              Text(
+                widget.title,
+                style: TextStyle(
+                  color: widget.isSelected ? Colors.white : (_isHovering ? Colors.white : Colors.white54),
+                  fontWeight: widget.isSelected ? FontWeight.bold : FontWeight.w500,
+                  fontSize: 15,
+                  shadows: _isHovering || widget.isSelected
+                      ? [Shadow(color: color.withValues(alpha: 0.5), blurRadius: 10)]
+                      : null,
+                ),
+              ),
+            ],
+          ),
         ),
       ),
-      selected: isSelected,
-      selectedTileColor: primaryColor.withOpacity(0.1),
-      onTap: () {
-        onItemSelected(index);
-        Navigator.pop(context); // Chiudi il drawer
-      },
     );
   }
 }

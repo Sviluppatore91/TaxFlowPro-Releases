@@ -14,8 +14,8 @@ class ReportUtils {
       builder: (context, child) {
         return Theme(
           data: ThemeData.dark().copyWith(
-            colorScheme: const ColorScheme.dark(
-              primary: Colors.blueAccent,
+            colorScheme: ColorScheme.dark(
+              primary: Theme.of(context).colorScheme.primary,
               onPrimary: Colors.white,
               surface: Color(0xFF1E1E24),
               onSurface: Colors.white,

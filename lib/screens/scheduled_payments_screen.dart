@@ -3,12 +3,10 @@ import '../database/database_helper.dart';
 import 'package:provider/provider.dart';
 import '../providers/app_theme_provider.dart';
 import 'payment_form_screen.dart';
-import 'payment_summary_screen.dart';
 import '../services/pdf_report_service.dart';
 import '../utils/report_utils.dart';
 import '../utils/security_utils.dart';
 import '../utils/date_utils_app.dart';
-import 'package:intl/intl.dart';
 import '../utils/currency_utils.dart';
 import 'package:pdf/widgets.dart' as pw;
 
@@ -48,14 +46,14 @@ class _ScheduledPaymentsScreenState extends State<ScheduledPaymentsScreen> {
         title: Text('Conferma', style: TextStyle(color: Colors.white)),
         content: Text(
           'Eliminare questo pagamento programmato?',
-          style: TextStyle(color: Colors.white.withOpacity(0.7)),
+          style: TextStyle(color: Colors.white.withValues(alpha: 0.7)),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
             child: Text(
               'Annulla',
-              style: TextStyle(color: Colors.white.withOpacity(0.54)),
+              style: TextStyle(color: Colors.white.withValues(alpha: 0.54)),
             ),
           ),
           TextButton(
@@ -82,14 +80,14 @@ class _ScheduledPaymentsScreenState extends State<ScheduledPaymentsScreen> {
         title: Text('Conferma Pagamento', style: TextStyle(color: Colors.white)),
         content: Text(
           'Vuoi registrare questo pagamento programmato come pagato?',
-          style: TextStyle(color: Colors.white.withOpacity(0.7)),
+          style: TextStyle(color: Colors.white.withValues(alpha: 0.7)),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
             child: Text(
               'Annulla',
-              style: TextStyle(color: Colors.white.withOpacity(0.54)),
+              style: TextStyle(color: Colors.white.withValues(alpha: 0.54)),
             ),
           ),
           TextButton(
@@ -138,7 +136,7 @@ class _ScheduledPaymentsScreenState extends State<ScheduledPaymentsScreen> {
         elevation: 0,
         actions: [
           IconButton(
-            icon: Icon(Icons.print, color: Colors.blueAccent),
+            icon: Icon(Icons.print, color: Theme.of(context).colorScheme.primary),
             tooltip: 'Esporta in PDF',
             onPressed: () async {
               if (_payments.isEmpty) return;
@@ -152,15 +150,14 @@ class _ScheduledPaymentsScreenState extends State<ScheduledPaymentsScreen> {
                 return ReportUtils.isDateInRange(date, range);
               }).toList();
               if (filteredPayments.isEmpty) {
-                if (mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text(
-                        'Nessun movimento nel periodo selezionato.',
-                      ),
+                if (!mounted) return;
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text(
+                      'Nessun movimento nel periodo selezionato.',
                     ),
-                  );
-                }
+                  ),
+                );
                 return;
               }
               final List<List<String>>
@@ -184,12 +181,13 @@ class _ScheduledPaymentsScreenState extends State<ScheduledPaymentsScreen> {
                 String metodo = p['payment_method']?.toString() ?? '';
                 if (metodo.toLowerCase() == 'bonifico') {
                   metodo = 'BON';
-                } else if (metodo.toLowerCase() == 'contanti')
+                } else if (metodo.toLowerCase() == 'contanti') {
                   metodo = 'C/C';
-                else if (metodo.toLowerCase() == 'assegno')
+                } else if (metodo.toLowerCase() == 'assegno') {
                   metodo = 'ASS';
-                else if (metodo.toLowerCase() == 'pos')
+                } else if (metodo.toLowerCase() == 'pos') {
                   metodo = 'POS';
+                }
 
                 final importo =
                     CurrencyUtils.formatEuro(double.tryParse(p['amount']?.toString() ?? '0') ?? 0);
@@ -247,7 +245,7 @@ class _ScheduledPaymentsScreenState extends State<ScheduledPaymentsScreen> {
             },
           ),
           IconButton(
-            icon: Icon(Icons.add, color: Colors.blueAccent),
+            icon: Icon(Icons.add, color: Theme.of(context).colorScheme.primary),
             onPressed: () async {
               await Navigator.push(
                 context,
@@ -262,7 +260,7 @@ class _ScheduledPaymentsScreenState extends State<ScheduledPaymentsScreen> {
       ),
       body: _isLoading
           ? Center(
-              child: CircularProgressIndicator(color: Colors.blueAccent),
+              child: CircularProgressIndicator(color: Theme.of(context).colorScheme.primary),
             )
           : ListView.builder(
               padding: const EdgeInsets.all(16),
@@ -276,10 +274,12 @@ class _ScheduledPaymentsScreenState extends State<ScheduledPaymentsScreen> {
                 final notes = p['notes']?.toString() ?? '';
 
                 final List<String> infoLines = [];
-                if (customerName.isNotEmpty)
+                if (customerName.isNotEmpty) {
                   infoLines.add('\u{1F464} $customerName');
-                if (serviceName.isNotEmpty)
+                }
+                if (serviceName.isNotEmpty) {
                   infoLines.add('\u{1F3B5} $serviceName');
+                }
                 if (notes.isNotEmpty) infoLines.add('\u{1F4DD} $notes');
                 final subtitleText = infoLines.isNotEmpty
                     ? infoLines.join("  -  ")
@@ -290,7 +290,7 @@ class _ScheduledPaymentsScreenState extends State<ScheduledPaymentsScreen> {
                   decoration: BoxDecoration(
                     color: theme.cardColor,
                     borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: theme.borderColor),
+                    border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
                   ),
                   child: Material(
                     type: MaterialType.transparency,
@@ -324,8 +324,8 @@ class _ScheduledPaymentsScreenState extends State<ScheduledPaymentsScreen> {
                                 padding: const EdgeInsets.all(8),
                                 decoration: BoxDecoration(
                                   color: (p['status'] == 'Pagato' || p['status'] == 'PAID') 
-                                      ? Colors.greenAccent.withOpacity(0.1) 
-                                      : Colors.orangeAccent.withOpacity(0.1),
+                                      ? Colors.greenAccent.withValues(alpha: 0.1) 
+                                      : Colors.orangeAccent.withValues(alpha: 0.1),
                                   shape: BoxShape.circle,
                                 ),
                                 child: Icon(
@@ -366,7 +366,7 @@ class _ScheduledPaymentsScreenState extends State<ScheduledPaymentsScreen> {
                                           return dateStr;
                                         }(),
                                         style: TextStyle(
-                                          color: Colors.white.withOpacity(0.54),
+                                          color: Colors.white.withValues(alpha: 0.54),
                                           fontSize: 12,
                                         ),
                                       ),
@@ -400,9 +400,9 @@ class _ScheduledPaymentsScreenState extends State<ScheduledPaymentsScreen> {
                                   SizedBox(height: 4),
                                   Row(
                                     children: [
-                                      Icon(Icons.attachment, color: Colors.blueAccent, size: 12),
+                                      Icon(Icons.attachment, color: Theme.of(context).colorScheme.primary, size: 12),
                                       SizedBox(width: 4),
-                                      Text('Allegato', style: TextStyle(color: Colors.blueAccent, fontSize: 11)),
+                                      Text('Allegato', style: TextStyle(color: Theme.of(context).colorScheme.primary, fontSize: 11)),
                                     ],
                                   ),
                                 ],

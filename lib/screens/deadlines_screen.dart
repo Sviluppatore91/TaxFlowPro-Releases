@@ -7,12 +7,9 @@ import 'package:url_launcher/url_launcher.dart';
 import '../database/database_helper.dart';
 import '../providers/app_theme_provider.dart';
 import '../services/attachment_service.dart';
-import '../services/pdf_report_service.dart';
-import '../utils/report_utils.dart';
 import '../utils/security_utils.dart';
-import 'calendar_screen.dart';
 import '../utils/currency_utils.dart';
-import 'package:pdf/widgets.dart' as pw;
+import 'package:tax_flow_pro/widgets/timeline_deadline_card.dart';
 
 class DeadlinesScreen extends StatefulWidget {
   const DeadlinesScreen({super.key});
@@ -189,8 +186,8 @@ class _DeadlinesScreenState extends State<DeadlinesScreen> {
         lastDate: DateTime(2035),
         builder: (ctx, child) => Theme(
           data: ThemeData.dark().copyWith(
-            colorScheme: const ColorScheme.dark(
-              primary: Colors.blueAccent,
+            colorScheme: ColorScheme.dark(
+              primary: Theme.of(context).colorScheme.primary,
               surface: Color(0xFF1E1E24),
             ),
           ),
@@ -317,7 +314,7 @@ class _DeadlinesScreenState extends State<DeadlinesScreen> {
                                   color: Colors.white38, size: 18),
                               SizedBox(width: 8),
                               Text('Stato:',
-                                  style: TextStyle(color: Colors.white.withOpacity(0.54))),
+                                  style: TextStyle(color: Colors.white.withValues(alpha: 0.54))),
                               SizedBox(width: 12),
                               DropdownButton<String>(
                                 value: status,
@@ -348,7 +345,7 @@ class _DeadlinesScreenState extends State<DeadlinesScreen> {
                   // Allegati
                   Text('Allegati (Foto/File)',
                       style: TextStyle(
-                          color: Colors.white.withOpacity(0.7),
+                          color: Colors.white.withValues(alpha: 0.7),
                           fontWeight: FontWeight.bold,
                           fontSize: 14)),
                   SizedBox(height: 8),
@@ -365,7 +362,7 @@ class _DeadlinesScreenState extends State<DeadlinesScreen> {
                         ),
                         child: Row(
                           children: [
-                            Icon(Icons.attachment, color: Colors.blueAccent, size: 20),
+                            Icon(Icons.attachment, color: Theme.of(context).colorScheme.primary, size: 20),
                             SizedBox(width: 8),
                             Expanded(
                               child: InkWell(
@@ -373,7 +370,7 @@ class _DeadlinesScreenState extends State<DeadlinesScreen> {
                                 child: Text(
                                   'Allegato ${idx + 1}',
                                   style: TextStyle(
-                                      color: Colors.blueAccent,
+                                      color: Theme.of(context).colorScheme.primary,
                                       decoration: TextDecoration.underline),
                                 ),
                               ),
@@ -401,7 +398,7 @@ class _DeadlinesScreenState extends State<DeadlinesScreen> {
                       padding: EdgeInsets.all(8.0),
                       child: Center(
                           child: CircularProgressIndicator(
-                              color: Colors.blueAccent)),
+                              color: Theme.of(context).colorScheme.primary)),
                     ),
                   SizedBox(height: 8),
                   if (!isReadOnly)
@@ -410,7 +407,7 @@ class _DeadlinesScreenState extends State<DeadlinesScreen> {
                       children: [
                         if (Platform.isAndroid || Platform.isIOS)
                           IconButton(
-                            icon: Icon(Icons.camera_alt, color: Colors.white.withOpacity(0.54)),
+                            icon: Icon(Icons.camera_alt, color: Colors.white.withValues(alpha: 0.54)),
                             onPressed: () async {
                               final file = await _attachmentService.pickImageFromCamera(context);
                               if (file != null) {
@@ -431,7 +428,7 @@ class _DeadlinesScreenState extends State<DeadlinesScreen> {
                             },
                           ),
                         IconButton(
-                          icon: Icon(Icons.image, color: Colors.white.withOpacity(0.54)),
+                          icon: Icon(Icons.image, color: Colors.white.withValues(alpha: 0.54)),
                           onPressed: () async {
                             final file = await _attachmentService.pickFile(context);
                             if (file != null) {
@@ -463,14 +460,14 @@ class _DeadlinesScreenState extends State<DeadlinesScreen> {
                       TextButton(
                         onPressed: () => Navigator.pop(ctx),
                         child: Text('Annulla',
-                            style: TextStyle(color: Colors.white.withOpacity(0.54))),
+                            style: TextStyle(color: Colors.white.withValues(alpha: 0.54))),
                       ),
                       if (!isReadOnly)
                         ElevatedButton.icon(
                           icon: Icon(Icons.save, size: 18),
                           label: Text('Salva'),
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.blueAccent,
+                            backgroundColor: Theme.of(context).colorScheme.primary,
                             foregroundColor: Colors.white,
                             shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(10)),
@@ -519,7 +516,8 @@ class _DeadlinesScreenState extends State<DeadlinesScreen> {
                             } else {
                               await _dbHelper.updateDeadline(data);
                             }
-                            if (mounted) Navigator.pop(ctx);
+                            if (!ctx.mounted) return;
+                            Navigator.pop(ctx);
                             _loadDeadlines();
                           },
                         ),
@@ -550,7 +548,7 @@ class _DeadlinesScreenState extends State<DeadlinesScreen> {
       style: TextStyle(color: Colors.white),
       decoration: InputDecoration(
         labelText: label,
-        labelStyle: TextStyle(color: Colors.white.withOpacity(0.54), fontSize: 13),
+        labelStyle: TextStyle(color: Colors.white.withValues(alpha: 0.54), fontSize: 13),
         prefixIcon: Icon(icon, color: Colors.white38, size: 18),
         filled: true,
         fillColor: Colors.white.withValues(alpha: 0.04),
@@ -562,7 +560,7 @@ class _DeadlinesScreenState extends State<DeadlinesScreen> {
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10),
-          borderSide: const BorderSide(color: Colors.blueAccent),
+          borderSide: BorderSide(color: Theme.of(context).colorScheme.primary),
         ),
       ),
     );
@@ -589,7 +587,7 @@ class _DeadlinesScreenState extends State<DeadlinesScreen> {
           color: Colors.white.withValues(alpha: 0.04),
           borderRadius: BorderRadius.circular(10),
           border: Border.all(
-            color: date != null ? Colors.blueAccent.withValues(alpha: 0.5) : Colors.white24,
+            color: date != null ? Theme.of(context).colorScheme.primary.withValues(alpha: 0.5) : Colors.white24,
           ),
         ),
         child: Column(
@@ -602,7 +600,7 @@ class _DeadlinesScreenState extends State<DeadlinesScreen> {
             Row(
               children: [
                 Icon(Icons.calendar_today,
-                    color: Colors.blueAccent, size: 14),
+                    color: Theme.of(context).colorScheme.primary, size: 14),
                 SizedBox(width: 6),
                 Expanded(
                   child: Text(
@@ -635,105 +633,92 @@ class _DeadlinesScreenState extends State<DeadlinesScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = context.watch<AppThemeProvider>();
-    final dateFormat = theme.dateFormat;
+    context.watch<AppThemeProvider>();
 
     return Scaffold(
       backgroundColor: Colors.transparent,
-      appBar: AppBar(
-        title: Text('Scadenze',
-            style:
-                TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        actions: [
-          IconButton(
-            icon: Icon(Icons.edit_calendar, color: Colors.blueAccent),
-            tooltip: 'Calendario Eventi',
-            onPressed: () {
-              // Non serve il controllo di ruolo qui, se vogliamo renderlo disponibile,
-              // ma possiamo recuperare il ruolo dal provider se necessario, per ora lo passiamo fisso
-              // o verifichiamo la biometria dentro calendar_screen.
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (_) => const CalendarScreen(role: 'admin')),
-              );
-            },
-          ),
-          IconButton(
-            icon: Icon(Icons.print, color: Colors.blueAccent),
-            tooltip: 'Esporta in PDF',
-            onPressed: () async {
-              if (_deadlines.isEmpty) return;
-
-              // Richiedi il periodo con il filtro
-              final range = await ReportUtils.showDateRangeFilterDialog(context);
-              if (range == null) return; // Annullato dall'utente
-
-              // Filtra le scadenze in base al range
-              final filteredDeadlines = _deadlines.where((d) {
-                final dateFrom = d['date_from'] as String?;
-                if (dateFrom == null || dateFrom.isEmpty) return true;
-                return ReportUtils.isDateInRange(dateFrom, range);
-              }).toList();
-
-              if (filteredDeadlines.isEmpty) {
-                if (mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Nessuna scadenza nel periodo selezionato.')),
-                  );
-                }
-                return;
-              }
-
-              final List<List<String>> data = filteredDeadlines.map<List<String>>((d) {
-                final date = _buildDateLabel(d, dateFormat);
-                final title = d['title']?.toString() ?? '';
-                final amountStr = d['amount']?.toString() ?? '0.0';
-                final amount = CurrencyUtils.formatEuro(CurrencyUtils.parseCurrency(amountStr));
-                final status = d['status'] == 'PAID' ? 'Pagato' : 'Pend.';
-                return [title, date, amount, status];
-              }).toList();
-              
-              await PDFReportService.generateAndDownloadReport(
-                title: 'Scadenze',
-                headers: ['Descrizione', 'Data', 'Importo', 'Stato'],
-                data: data,
-                columnWidths: {
-                  0: const pw.FlexColumnWidth(3),
-                  1: const pw.FixedColumnWidth(80),
-                  2: const pw.FixedColumnWidth(60),
-                  3: const pw.FixedColumnWidth(50),
-                },
-                dateRangeText: ReportUtils.formatDateRangeText(range, dateFormat),
-                dateFormatString: dateFormat,
-              );
-            },
-          ),
-          IconButton(
-            icon: Icon(Icons.add, color: Colors.blueAccent),
-            onPressed: () => _showDeadlineDialog(),
-          ),
-        ],
-      ),
       body: _isLoading
-          ? Center(
-              child: CircularProgressIndicator(color: Colors.blueAccent))
+          ? Center(child: CircularProgressIndicator(color: Theme.of(context).colorScheme.primary))
           : Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                // Banner totali
-                _buildTotalsBanner(theme),
-                // Lista scadenze
+                // Header and Filters
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 24.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'AGENDA E SCADENZE',
+                        style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold, letterSpacing: 1.5),
+                      ),
+                      Row(
+                        children: [
+                          IconButton(
+                            icon: Icon(Icons.print, color: Colors.white.withValues(alpha: 0.5)),
+                            onPressed: () {},
+                          ),
+                          IconButton(
+                            icon: Icon(Icons.add, color: Colors.white.withValues(alpha: 0.5)),
+                            onPressed: () => _showDeadlineDialog(),
+                          ),
+                        ],
+                      )
+                    ],
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                  child: Row(
+                    children: [
+                      _buildFilterChip('Tutte', true),
+                      const SizedBox(width: 8),
+                      _buildFilterChip('Fiscali', false),
+                      const SizedBox(width: 8),
+                      _buildFilterChip('Previdenziali', false),
+                      const SizedBox(width: 8),
+                      _buildFilterChip('Aziendali', false),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 24),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                  child: Text(
+                    'Prossime Scadenze',
+                    style: TextStyle(color: Colors.white.withValues(alpha: 0.7), fontSize: 14),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                
+                // Timeline List
                 Expanded(
                   child: _deadlines.isEmpty
                       ? _buildEmptyState()
                       : ListView.builder(
-                          padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+                          padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 8.0),
                           itemCount: _deadlines.length,
                           itemBuilder: (context, index) {
                             final d = _deadlines[index];
-                            return _buildDeadlineCard(
-                                d, theme, dateFormat);
+                            final colors = [
+                              const Color(0xFFE11D48), // Pink
+                              const Color(0xFF06B6D4), // Cyan
+                              const Color(0xFF10B981), // Green
+                            ];
+                            final isLast = index == _deadlines.length - 1;
+                            
+                            return TimelineDeadlineCard(
+                              deadline: d,
+                              timelineColor: colors[index % colors.length],
+                              isLast: isLast,
+                              onTap: () => _showDeadlineDialog(deadline: d, isReadOnly: false),
+                              onDetails: () => _showDeadlineDialog(deadline: d, isReadOnly: false),
+                              onPay: () async {
+                                if (mounted) {
+                                  _togglePaid(d);
+                                }
+                              },
+                            );
                           },
                         ),
                 ),
@@ -742,325 +727,21 @@ class _DeadlinesScreenState extends State<DeadlinesScreen> {
     );
   }
 
-  Widget _buildTotalsBanner(AppThemeProvider theme) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
-      child: Row(
-        children: [
-          Expanded(
-            child: _buildTotalChip(
-              label: 'Da pagare',
-              amount: _totalPending,
-              color: Colors.orangeAccent,
-              icon: Icons.hourglass_empty,
-            ),
-          ),
-          SizedBox(width: 12),
-          Expanded(
-            child: _buildTotalChip(
-              label: 'Già pagato',
-              amount: _totalPaid,
-              color: Colors.greenAccent,
-              icon: Icons.check_circle_outline,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildTotalChip({
-    required String label,
-    required double amount,
-    required Color color,
-    required IconData icon,
-  }) {
+  Widget _buildFilterChip(String label, bool isSelected) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.08),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: color.withValues(alpha: 0.3)),
-      ),
-      child: Row(
-        children: [
-          Icon(icon, color: color, size: 18),
-          SizedBox(width: 8),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(label,
-                    style: TextStyle(
-                        color: color.withValues(alpha: 0.8), fontSize: 11)),
-                Text(
-                  CurrencyUtils.formatEuro(amount),
-                  style: TextStyle(
-                    color: color,
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildDeadlineCard(
-      Map<String, dynamic> d, AppThemeProvider theme, String dateFormat) {
-    final status = _getDeadlineStatus(d);
-    final isPaid = status == _DeadlineStatus.paid;
-    final isOverdue = status == _DeadlineStatus.overdue;
-    final amount = (d['amount'] as num?)?.toDouble() ?? 0.0;
-    final notes = d['notes'] as String? ?? '';
-
-    Color statusColor;
-    String statusLabel;
-    IconData statusIcon;
-    switch (status) {
-      case _DeadlineStatus.paid:
-        statusColor = Colors.greenAccent;
-        statusLabel = 'Pagato';
-        statusIcon = Icons.check_circle;
-        break;
-      case _DeadlineStatus.overdue:
-        statusColor = Colors.redAccent;
-        statusLabel = 'Scaduto';
-        statusIcon = Icons.error_outline;
-        break;
-      default:
-        statusColor = Colors.orangeAccent;
-        statusLabel = 'Da pagare';
-        statusIcon = Icons.hourglass_empty;
-    }
-
-    return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      decoration: BoxDecoration(
-        color: theme.cardColor,
-        borderRadius: BorderRadius.circular(14),
+        color: isSelected ? Colors.white.withValues(alpha: 0.1) : Colors.transparent,
+        borderRadius: BorderRadius.circular(20),
         border: Border.all(
-          color: isPaid
-              ? Colors.greenAccent.withValues(alpha: 0.3)
-              : isOverdue
-                  ? Colors.redAccent.withValues(alpha: 0.3)
-                  : theme.borderColor,
+          color: isSelected ? Colors.white.withValues(alpha: 0.3) : Colors.transparent,
         ),
       ),
-      child: Material(
-        type: MaterialType.transparency,
-        child: InkWell(
-          borderRadius: BorderRadius.circular(14),
-          onTap: () => _showDeadlineDialog(deadline: d, isReadOnly: true),
-          child: Padding(
-            padding: const EdgeInsets.all(14),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    GestureDetector(
-                      onTap: () async {
-                        final auth = await SecurityUtils.requireAdminAuth(context);
-                        if (auth && mounted) {
-                          _togglePaid(d);
-                        }
-                      },
-                      child: Container(
-                        padding: const EdgeInsets.all(8),
-                        decoration: BoxDecoration(
-                          color: statusColor.withValues(alpha: 0.1),
-                          shape: BoxShape.circle,
-                        ),
-                        child: Icon(statusIcon, color: statusColor, size: 20),
-                      ),
-                    ),
-                    SizedBox(width: 12),
-                    // Titolo + data
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            d['title'] ?? 'Scadenza',
-                            style: TextStyle(
-                              color: isPaid ? Colors.white54 : Colors.white,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 15,
-                              decoration: isPaid
-                                  ? TextDecoration.lineThrough
-                                  : null,
-                            ),
-                          ),
-                          SizedBox(height: 4),
-                          Row(
-                            children: [
-                              Icon(Icons.calendar_today,
-                                  color: Colors.white38, size: 12),
-                              SizedBox(width: 4),
-                              Text(
-                                _buildDateLabel(d, dateFormat),
-                                style: TextStyle(
-                                    color: Colors.white.withOpacity(0.54), fontSize: 12),
-                              ),
-                            ],
-                          ),
-                          if (notes.isNotEmpty) ...[
-                            SizedBox(height: 4),
-                            Text(notes,
-                                style: TextStyle(
-                                    color: Colors.white38, fontSize: 11),
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis),
-                          ],
-                          if (d['attachments'] != null && (d['attachments'] as List).isNotEmpty) ...[
-                            SizedBox(height: 4),
-                            Row(
-                              children: [
-                                Icon(Icons.attachment, color: Colors.blueAccent, size: 12),
-                                SizedBox(width: 4),
-                                Text('${(d['attachments'] as List).length} allegati', style: TextStyle(color: Colors.blueAccent, fontSize: 11)),
-                              ],
-                            ),
-                          ],
-                        ],
-                      ),
-                    ),
-                    // Importo + azioni
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.end,
-                      children: [
-                        if (amount > 0)
-                          Text(
-                            CurrencyUtils.formatEuro(amount),
-                            style: TextStyle(
-                              color: isPaid ? Colors.greenAccent : Colors.white,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 15,
-                              decoration: isPaid
-                                  ? TextDecoration.lineThrough
-                                  : null,
-                            ),
-                          ),
-                        SizedBox(height: 4),
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 8, vertical: 2),
-                          decoration: BoxDecoration(
-                            color: statusColor.withValues(alpha: 0.15),
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          child: Text(statusLabel,
-                              style: TextStyle(
-                                  color: statusColor, fontSize: 10)),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-                SizedBox(height: 10),
-                // Azioni rapide
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    // Aggiungi a calendario
-                    TextButton.icon(
-                      onPressed: () => _addToCalendar(d),
-                      icon: Icon(Icons.event_available,
-                          size: 14, color: Colors.blueAccent),
-                      label: Text('Aggiungi al Calendario',
-                          style: TextStyle(
-                              color: Colors.blueAccent, fontSize: 11)),
-                      style: TextButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 8, vertical: 4),
-                      ),
-                    ),
-                    // Toggle pagato
-                    TextButton.icon(
-                      onPressed: () async {
-                        final auth = await SecurityUtils.requireAdminAuth(context);
-                        if (auth && mounted) {
-                          _togglePaid(d);
-                        }
-                      },
-                      icon: Icon(
-                        isPaid ? Icons.undo : Icons.check,
-                        size: 14,
-                        color: isPaid ? Colors.orangeAccent : Colors.greenAccent,
-                      ),
-                      label: Text(
-                        isPaid ? 'Segna Pendente' : 'Segna Pagato',
-                        style: TextStyle(
-                          color: isPaid
-                              ? Colors.orangeAccent
-                              : Colors.greenAccent,
-                          fontSize: 11,
-                        ),
-                      ),
-                      style: TextButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 8, vertical: 4),
-                      ),
-                    ),
-                    // Modifica
-                    IconButton(
-                      icon: Icon(Icons.edit_outlined,
-                          color: Colors.blueAccent, size: 18),
-                      onPressed: () async {
-                        final auth = await SecurityUtils.requireAdminAuth(context);
-                        if (auth && mounted) {
-                          _showDeadlineDialog(deadline: d, isReadOnly: false);
-                        }
-                      },
-                    ),
-                    // Elimina
-                    IconButton(
-                      icon: Icon(Icons.delete_outline,
-                          color: Colors.redAccent, size: 18),
-                      onPressed: () async {
-                        final auth = await SecurityUtils.requireAdminAuth(context);
-                        if (!auth || !mounted) return;
-                        
-                        final confirm = await showDialog<bool>(
-                          context: context,
-                          builder: (ctx) => AlertDialog(
-                            backgroundColor: const Color(0xFF1E1E24),
-                            title: Text('Elimina Scadenza',
-                                style: TextStyle(color: Colors.white)),
-                            content: Text(
-                                'Sei sicuro di voler eliminare questa scadenza?',
-                                style: TextStyle(color: Colors.white.withOpacity(0.7))),
-                            actions: [
-                              TextButton(
-                                  onPressed: () =>
-                                      Navigator.pop(ctx, false),
-                                  child: Text('Annulla')),
-                              ElevatedButton(
-                                style: ElevatedButton.styleFrom(
-                                    backgroundColor: Colors.redAccent),
-                                onPressed: () =>
-                                    Navigator.pop(ctx, true),
-                                child: Text('Elimina'),
-                              ),
-                            ],
-                          ),
-                        );
-                        if (confirm == true) {
-                          await _dbHelper.deleteDeadline(d['id']);
-                          _loadDeadlines();
-                        }
-                      },
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
+      child: Text(
+        label,
+        style: TextStyle(
+          color: isSelected ? Colors.white : Colors.white.withValues(alpha: 0.5),
+          fontSize: 13,
         ),
       ),
     );
@@ -1086,6 +767,4 @@ class _DeadlinesScreenState extends State<DeadlinesScreen> {
 }
 
 enum _DeadlineStatus { pending, paid, overdue }
-
-
 

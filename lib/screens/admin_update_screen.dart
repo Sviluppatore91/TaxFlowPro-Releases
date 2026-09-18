@@ -35,7 +35,7 @@ class AdminUpdateScreen extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Icon(Icons.cloud_upload_rounded, size: 80, color: Colors.blueAccent),
+              Icon(Icons.cloud_upload_rounded, size: 80, color: Theme.of(context).colorScheme.primary),
               SizedBox(height: 24),
               Text(
                 'Distribuzione con GitHub Releases',
@@ -66,7 +66,7 @@ class AdminUpdateScreen extends StatelessWidget {
                         '2. Crea un repository pubblico chiamato "TaxFlowPro-Releases"\n'
                         '3. Apri il file "lib/services/update_service.dart"\n'
                         '4. Modifica "TUO_USERNAME" con il tuo vero nome utente',
-                        style: TextStyle(color: Colors.white.withOpacity(0.7)),
+                        style: TextStyle(color: Colors.white.withValues(alpha: 0.7)),
                       ),
                     ],
                   ),
@@ -77,7 +77,7 @@ class AdminUpdateScreen extends StatelessWidget {
                   decoration: BoxDecoration(
                     color: const Color(0xFF1E1E24),
                     borderRadius: BorderRadius.circular(16),
-                    border: Border.all(color: Colors.blueAccent.withValues(alpha: 0.3)),
+                    border: Border.all(color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.3)),
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -106,7 +106,7 @@ class AdminUpdateScreen extends StatelessWidget {
                   child: Text('Apri Pagina GitHub', style: TextStyle(fontSize: 18)),
                 ),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.blueAccent,
+                  backgroundColor: Theme.of(context).colorScheme.primary,
                   foregroundColor: Colors.white,
                   disabledBackgroundColor: Colors.grey.shade800,
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -127,8 +127,8 @@ class AdminUpdateScreen extends StatelessWidget {
           width: 28,
           height: 28,
           alignment: Alignment.center,
-          decoration: const BoxDecoration(
-            color: Colors.blueAccent,
+          decoration: BoxDecoration(
+            color: Theme.of(context).colorScheme.primary,
             shape: BoxShape.circle,
           ),
           child: Text('$number', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
@@ -140,7 +140,7 @@ class AdminUpdateScreen extends StatelessWidget {
             children: [
               Text(title, style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
               SizedBox(height: 4),
-              Text(description, style: TextStyle(color: Colors.white.withOpacity(0.7))),
+              Text(description, style: TextStyle(color: Colors.white.withValues(alpha: 0.7))),
             ],
           ),
         ),
@@ -148,6 +148,5 @@ class AdminUpdateScreen extends StatelessWidget {
     );
   }
 }
-
 
 

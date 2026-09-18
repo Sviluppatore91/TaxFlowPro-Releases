@@ -1,3 +1,4 @@
+import 'package:tax_flow_pro/utils/logger.dart';
 import 'dart:io';
 import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
@@ -75,7 +76,7 @@ class _ImageCropperScreenState extends State<ImageCropperScreen> {
         throw Exception("Impossibile decodificare l'immagine ritagliata.");
       }
     } catch (e) {
-      print("Errore durante l'elaborazione dell'immagine: $e");
+      appLogger.e("Errore durante l'elaborazione dell'immagine: $e");
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Errore durante il ritaglio: $e')),

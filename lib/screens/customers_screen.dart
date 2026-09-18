@@ -11,8 +11,8 @@ import '../widgets/gradient_scaffold.dart';
 import '../widgets/glass_container.dart';
 import '../services/pdf_report_service.dart';
 import '../utils/report_utils.dart';
-import '../utils/currency_utils.dart';
 import 'package:pdf/widgets.dart' as pw;
+import '../widgets/client_card.dart';
 
 class CustomersScreen extends StatefulWidget {
   const CustomersScreen({super.key});
@@ -105,14 +105,14 @@ class _CustomersScreenState extends State<CustomersScreen> {
       padding: const EdgeInsets.only(top: 24, bottom: 8),
       child: Row(
         children: [
-          Icon(icon, color: Colors.blueAccent, size: 20),
+          Icon(icon, color: Theme.of(context).colorScheme.primary, size: 20),
           SizedBox(width: 8),
           Text(
             title,
             style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.bold,
-              color: Colors.blueAccent,
+              color: Theme.of(context).colorScheme.primary,
             ),
           ),
         ],
@@ -126,12 +126,12 @@ class _CustomersScreenState extends State<CustomersScreen> {
       style: TextStyle(color: Colors.white),
       decoration: InputDecoration(
         labelText: label,
-        labelStyle: TextStyle(color: Colors.white.withOpacity(0.7), fontSize: 13),
+        labelStyle: TextStyle(color: Colors.white.withValues(alpha: 0.7), fontSize: 13),
         enabledBorder: UnderlineInputBorder(
           borderSide: BorderSide(color: Colors.white38),
         ),
         focusedBorder: UnderlineInputBorder(
-          borderSide: BorderSide(color: Colors.blueAccent),
+          borderSide: BorderSide(color: Theme.of(context).colorScheme.primary),
         ),
       ),
     );
@@ -263,15 +263,15 @@ class _CustomersScreenState extends State<CustomersScreen> {
                                     fit: BoxFit.cover,
                                   )
                                 : null,
-                            border: Border.all(color: Colors.white.withOpacity(0.54)),
+                            border: Border.all(color: Colors.white.withValues(alpha: 0.54)),
                           ),
                           child: logoPath == null || !File(logoPath!).existsSync()
-                              ? Icon(Icons.add_a_photo, color: Colors.white.withOpacity(0.54), size: 30)
+                              ? Icon(Icons.add_a_photo, color: Colors.white.withValues(alpha: 0.54), size: 30)
                               : null,
                         ),
                       ),
                       SizedBox(height: 8),
-                      Text('Aggiungi Logo', style: TextStyle(color: Colors.white.withOpacity(0.54), fontSize: 12)),
+                      Text('Aggiungi Logo', style: TextStyle(color: Colors.white.withValues(alpha: 0.54), fontSize: 12)),
                       
                       _buildSectionTitle('Dati Principali', Icons.business),
                       Row(
@@ -349,7 +349,7 @@ class _CustomersScreenState extends State<CustomersScreen> {
                             onPressed: () => Navigator.pop(dialogContext),
                             child: Text(
                               'ANNULLA',
-                              style: TextStyle(color: Colors.white.withOpacity(0.7)),
+                              style: TextStyle(color: Colors.white.withValues(alpha: 0.7)),
                             ),
                           ),
                           SizedBox(width: 8),
@@ -424,7 +424,7 @@ class _CustomersScreenState extends State<CustomersScreen> {
               SizedBox(height: 16),
               Text(
                 'Eliminando questo cliente, i pagamenti associati rimarranno senza cliente. Procedere?',
-                style: TextStyle(color: Colors.white.withOpacity(0.7)),
+                style: TextStyle(color: Colors.white.withValues(alpha: 0.7)),
               ),
               SizedBox(height: 24),
               Row(
@@ -434,7 +434,7 @@ class _CustomersScreenState extends State<CustomersScreen> {
                     onPressed: () => Navigator.pop(context, false),
                     child: Text(
                       'ANNULLA',
-                      style: TextStyle(color: Colors.white.withOpacity(0.7)),
+                      style: TextStyle(color: Colors.white.withValues(alpha: 0.7)),
                     ),
                   ),
                   SizedBox(width: 8),
@@ -492,7 +492,7 @@ class _CustomersScreenState extends State<CustomersScreen> {
       margin: const EdgeInsets.only(bottom: 16),
       child: Row(
         children: [
-          Icon(Icons.filter_alt, color: Colors.white.withOpacity(0.7)),
+          Icon(Icons.filter_alt, color: Colors.white.withValues(alpha: 0.7)),
           SizedBox(width: 12),
           Expanded(
             child: Autocomplete<Customer>(
@@ -527,10 +527,10 @@ class _CustomersScreenState extends State<CustomersScreen> {
                       style: TextStyle(color: Colors.white),
                       decoration: InputDecoration(
                         hintText: 'Cerca Cliente (Tutti i Clienti)',
-                        hintStyle: TextStyle(color: Colors.white.withOpacity(0.54)),
+                        hintStyle: TextStyle(color: Colors.white.withValues(alpha: 0.54)),
                         border: InputBorder.none,
                         suffixIcon: IconButton(
-                          icon: Icon(Icons.clear, color: Colors.white.withOpacity(0.54)),
+                          icon: Icon(Icons.clear, color: Colors.white.withValues(alpha: 0.54)),
                           onPressed: () {
                             textEditingController.clear();
                             _onCustomerSelected(null);
@@ -561,7 +561,7 @@ class _CustomersScreenState extends State<CustomersScreen> {
             height: 48,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: Colors.blueAccent,
+              color: Theme.of(context).colorScheme.primary,
               image: customer.logoPath != null && File(customer.logoPath!).existsSync()
                   ? DecorationImage(
                       image: FileImage(File(customer.logoPath!)),
@@ -598,11 +598,11 @@ class _CustomersScreenState extends State<CustomersScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         if (customer.vatNumber?.isNotEmpty == true)
-                          Text('P.IVA: ${customer.vatNumber}', style: TextStyle(color: Colors.white.withOpacity(0.7), fontSize: 16)),
+                          Text('P.IVA: ${customer.vatNumber}', style: TextStyle(color: Colors.white.withValues(alpha: 0.7), fontSize: 16)),
                         if (customer.taxCode?.isNotEmpty == true)
-                          Text('C.F.: ${customer.taxCode}', style: TextStyle(color: Colors.white.withOpacity(0.7), fontSize: 16)),
+                          Text('C.F.: ${customer.taxCode}', style: TextStyle(color: Colors.white.withValues(alpha: 0.7), fontSize: 16)),
                         if (customer.sdiCode?.isNotEmpty == true)
-                          Text('SDI: ${customer.sdiCode}', style: TextStyle(color: Colors.white.withOpacity(0.7), fontSize: 16)),
+                          Text('SDI: ${customer.sdiCode}', style: TextStyle(color: Colors.white.withValues(alpha: 0.7), fontSize: 16)),
                       ],
                     ),
                   ),
@@ -614,7 +614,7 @@ class _CustomersScreenState extends State<CustomersScreen> {
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Icon(Icons.location_on, color: Colors.white.withOpacity(0.54), size: 20),
+                        Icon(Icons.location_on, color: Colors.white.withValues(alpha: 0.54), size: 20),
                         SizedBox(width: 8),
                         Expanded(
                           child: Text(
@@ -624,7 +624,7 @@ class _CustomersScreenState extends State<CustomersScreen> {
                               customer.addressCity,
                               if (customer.addressProvince?.isNotEmpty == true) '(${customer.addressProvince})'
                             ].where((e) => e != null && e.toString().isNotEmpty).join(' '),
-                            style: TextStyle(color: Colors.white.withOpacity(0.7), fontSize: 16),
+                            style: TextStyle(color: Colors.white.withValues(alpha: 0.7), fontSize: 16),
                           ),
                         ),
                       ],
@@ -639,13 +639,13 @@ class _CustomersScreenState extends State<CustomersScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         if (customer.email?.isNotEmpty == true)
-                          Row(children: [Icon(Icons.email, color: Colors.white.withOpacity(0.54), size: 20), SizedBox(width: 8), Expanded(child: Text(customer.email!, style: TextStyle(color: Colors.white.withOpacity(0.7), fontSize: 16)))]),
+                          Row(children: [Icon(Icons.email, color: Colors.white.withValues(alpha: 0.54), size: 20), SizedBox(width: 8), Expanded(child: Text(customer.email!, style: TextStyle(color: Colors.white.withValues(alpha: 0.7), fontSize: 16)))]),
                         if (customer.pec?.isNotEmpty == true)
-                          Row(children: [Icon(Icons.mark_email_read, color: Colors.white.withOpacity(0.54), size: 20), SizedBox(width: 8), Expanded(child: Text('PEC: ${customer.pec}', style: TextStyle(color: Colors.white.withOpacity(0.7), fontSize: 16)))]),
+                          Row(children: [Icon(Icons.mark_email_read, color: Colors.white.withValues(alpha: 0.54), size: 20), SizedBox(width: 8), Expanded(child: Text('PEC: ${customer.pec}', style: TextStyle(color: Colors.white.withValues(alpha: 0.7), fontSize: 16)))]),
                         if (customer.phone?.isNotEmpty == true)
-                          Row(children: [Icon(Icons.phone, color: Colors.white.withOpacity(0.54), size: 20), SizedBox(width: 8), Expanded(child: Text(customer.phone!, style: TextStyle(color: Colors.white.withOpacity(0.7), fontSize: 16)))]),
+                          Row(children: [Icon(Icons.phone, color: Colors.white.withValues(alpha: 0.54), size: 20), SizedBox(width: 8), Expanded(child: Text(customer.phone!, style: TextStyle(color: Colors.white.withValues(alpha: 0.7), fontSize: 16)))]),
                         if (customer.contacts?.isNotEmpty == true && customer.email?.isEmpty == true && customer.phone?.isEmpty == true)
-                          Row(children: [Icon(Icons.contact_mail, color: Colors.white.withOpacity(0.54), size: 20), SizedBox(width: 8), Expanded(child: Text(customer.contacts!, style: TextStyle(color: Colors.white.withOpacity(0.7), fontSize: 16)))]),
+                          Row(children: [Icon(Icons.contact_mail, color: Colors.white.withValues(alpha: 0.54), size: 20), SizedBox(width: 8), Expanded(child: Text(customer.contacts!, style: TextStyle(color: Colors.white.withValues(alpha: 0.7), fontSize: 16)))]),
                       ],
                     ),
                   ),
@@ -660,12 +660,12 @@ class _CustomersScreenState extends State<CustomersScreen> {
                         if (customer.cig?.isNotEmpty == true || customer.cup?.isNotEmpty == true)
                           Text(
                             'CIG: ${customer.cig ?? "-"} | CUP: ${customer.cup ?? "-"}',
-                            style: TextStyle(color: Colors.white.withOpacity(0.7), fontSize: 16),
+                            style: TextStyle(color: Colors.white.withValues(alpha: 0.7), fontSize: 16),
                           ),
                         if (customer.paReference?.isNotEmpty == true)
-                          Text('Rif. Ammin.: ${customer.paReference}', style: TextStyle(color: Colors.white.withOpacity(0.7), fontSize: 16)),
+                          Text('Rif. Ammin.: ${customer.paReference}', style: TextStyle(color: Colors.white.withValues(alpha: 0.7), fontSize: 16)),
                         if (customer.paContract?.isNotEmpty == true)
-                          Text('Commessa/Conv.: ${customer.paContract}', style: TextStyle(color: Colors.white.withOpacity(0.7), fontSize: 16)),
+                          Text('Commessa/Conv.: ${customer.paContract}', style: TextStyle(color: Colors.white.withValues(alpha: 0.7), fontSize: 16)),
                       ],
                     ),
                   ),
@@ -675,7 +675,7 @@ class _CustomersScreenState extends State<CustomersScreen> {
           Column(
             children: [
               IconButton(
-                icon: Icon(Icons.edit, color: Colors.blueAccent),
+                icon: Icon(Icons.edit, color: Theme.of(context).colorScheme.primary),
                 onPressed: () => _showCustomerDialog(customer),
                 tooltip: 'Modifica',
               ),
@@ -696,7 +696,7 @@ class _CustomersScreenState extends State<CustomersScreen> {
       return Center(
         child: Text(
           'Nessun cliente in anagrafica.',
-          style: TextStyle(color: Colors.white.withOpacity(0.54)),
+          style: TextStyle(color: Colors.white.withValues(alpha: 0.54)),
         ),
       );
     }
@@ -704,46 +704,12 @@ class _CustomersScreenState extends State<CustomersScreen> {
       itemCount: _customers.length,
       itemBuilder: (context, index) {
         final customer = _customers[index];
-        return Padding(
-          padding: const EdgeInsets.only(bottom: 8.0),
-          child: GlassContainer(
-            child: Material(
-              type: MaterialType.transparency,
-              child: ListTile(
-                leading: const CircleAvatar(
-                  backgroundColor: Colors.blueAccent,
-                  child: Icon(Icons.person, color: Colors.white),
-                ),
-                title: Text(
-                  customer.name,
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                subtitle: Text(
-                  customer.vatNumber?.isNotEmpty == true
-                      ? 'P.IVA: ${customer.vatNumber}'
-                      : 'Nessuna P.IVA specificata',
-                  style: TextStyle(color: Colors.white.withOpacity(0.7)),
-                ),
-                trailing: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    IconButton(
-                      icon: Icon(Icons.edit, color: Colors.blueAccent),
-                      onPressed: () => _showCustomerDialog(customer),
-                    ),
-                    IconButton(
-                      icon: Icon(Icons.delete, color: Colors.redAccent),
-                      onPressed: () => _deleteCustomer(customer.id!),
-                    ),
-                  ],
-                ),
-                onTap: () => _onCustomerSelected(customer),
-              ),
-            ),
-          ),
+        return ClientCard(
+          customer: customer,
+          isSelected: _selectedCustomer?.id == customer.id,
+          onTap: () => _onCustomerSelected(customer),
+          onEdit: () => _showCustomerDialog(customer),
+          onDelete: () => _deleteCustomer(customer.id!),
         );
       },
     );
@@ -784,7 +750,7 @@ class _CustomersScreenState extends State<CustomersScreen> {
           ),
           SizedBox(width: 8),
           IconButton(
-            icon: Icon(Icons.print, color: Colors.blueAccent),
+            icon: Icon(Icons.print, color: Theme.of(context).colorScheme.primary),
             tooltip: 'Esporta Storico Operazioni',
             onPressed: () async {
               if (_filteredPayments.isEmpty) return;
@@ -874,7 +840,7 @@ class _CustomersScreenState extends State<CustomersScreen> {
       return Center(
         child: Text(
           'Nessuna operazione registrata per questo cliente.',
-          style: TextStyle(color: Colors.white.withOpacity(0.54)),
+          style: TextStyle(color: Colors.white.withValues(alpha: 0.54)),
         ),
       );
     }
@@ -883,7 +849,7 @@ class _CustomersScreenState extends State<CustomersScreen> {
       return Center(
         child: Text(
           'Nessun risultato per questa ricerca.',
-          style: TextStyle(color: Colors.white.withOpacity(0.54)),
+          style: TextStyle(color: Colors.white.withValues(alpha: 0.54)),
         ),
       );
     }
@@ -920,7 +886,7 @@ class _CustomersScreenState extends State<CustomersScreen> {
                       Expanded(
                         child: Text(
                           serviceName,
-                          style: TextStyle(color: Colors.white.withOpacity(0.7), fontSize: 12),
+                          style: TextStyle(color: Colors.white.withValues(alpha: 0.7), fontSize: 12),
                           overflow: TextOverflow.ellipsis,
                         ),
                       ),
@@ -932,7 +898,7 @@ class _CustomersScreenState extends State<CustomersScreen> {
                   children: [
                     Text(
                       payment['date'] ?? '',
-                      style: TextStyle(color: Colors.white.withOpacity(0.54), fontSize: 12),
+                      style: TextStyle(color: Colors.white.withValues(alpha: 0.54), fontSize: 12),
                     ),
                     if (description.isNotEmpty)
                       Text(
@@ -946,7 +912,7 @@ class _CustomersScreenState extends State<CustomersScreen> {
                 trailing: payment['payment_method'] != null
                     ? Text(
                         payment['payment_method'],
-                        style: TextStyle(color: Colors.white.withOpacity(0.54), fontSize: 11),
+                        style: TextStyle(color: Colors.white.withValues(alpha: 0.54), fontSize: 11),
                       )
                     : null,
               ),
@@ -1054,7 +1020,7 @@ class _CustomersScreenState extends State<CustomersScreen> {
             ),
       floatingActionButton: FloatingActionButton(
         onPressed: () => _showCustomerDialog(),
-        backgroundColor: Colors.blueAccent,
+        backgroundColor: Theme.of(context).colorScheme.primary,
         child: Icon(Icons.add),
       ),
     );

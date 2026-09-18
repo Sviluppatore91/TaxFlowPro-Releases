@@ -1,3 +1,4 @@
+import 'package:tax_flow_pro/utils/logger.dart';
 import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:package_info_plus/package_info_plus.dart';
@@ -10,7 +11,7 @@ class UpdateService {
 
   // INSERISCI QUI IL TUO NOME UTENTE GITHUB
   // Es: 'MarioRossi/TaxFlowPro-Releases'
-  static const String githubRepo = 'TaxFlowPro-Releases/TaxFlowPro-Releases';
+  static const String githubRepo = 'Sviluppatore91/TaxFlowPro-Releases';
 
   int _versionToInt(String version) {
     String cleaned = version.replaceAll(RegExp(r'[^0-9.]'), '');
@@ -25,7 +26,7 @@ class UpdateService {
   Future<Map<String, dynamic>?> checkForUpdate() async {
     try {
       if (githubRepo.contains('TUO_USERNAME')) {
-        print("Devi impostare il tuo username GitHub in update_service.dart");
+        appLogger.i("Devi impostare il tuo username GitHub in update_service.dart");
         return null;
       }
 
@@ -74,7 +75,7 @@ class UpdateService {
         }
       }
     } catch (e) {
-      print("Errore controllo aggiornamenti GitHub: $e");
+      appLogger.e("Errore controllo aggiornamenti GitHub: $e");
     }
     return null;
   }
@@ -100,7 +101,7 @@ class UpdateService {
         }
       }
     } catch (e) {
-      print("Errore durante il download o installazione: $e");
+      appLogger.e("Errore durante il download o installazione: $e");
       rethrow;
     }
   }

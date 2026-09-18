@@ -106,7 +106,7 @@ class _NoteFormScreenState extends State<NoteFormScreen> {
                     item['checked'] = val;
                   });
                 },
-                activeColor: Colors.blueAccent,
+                activeColor: Theme.of(context).colorScheme.primary,
               ),
               Expanded(
                 child: TextFormField(
@@ -126,7 +126,7 @@ class _NoteFormScreenState extends State<NoteFormScreen> {
                 ),
               ),
               IconButton(
-                icon: Icon(Icons.close, color: Colors.white.withOpacity(0.54)),
+                icon: Icon(Icons.close, color: Colors.white.withValues(alpha: 0.54)),
                 onPressed: () {
                   setState(() {
                     _checklistItems.removeAt(index);
@@ -143,8 +143,8 @@ class _NoteFormScreenState extends State<NoteFormScreen> {
               _checklistItems.add({'text': '', 'checked': false});
             });
           },
-          icon: Icon(Icons.add, color: Colors.blueAccent),
-          label: Text('Aggiungi voce', style: TextStyle(color: Colors.blueAccent)),
+          icon: Icon(Icons.add, color: Theme.of(context).colorScheme.primary),
+          label: Text('Aggiungi voce', style: TextStyle(color: Theme.of(context).colorScheme.primary)),
         ),
       ],
     );
@@ -166,10 +166,10 @@ class _NoteFormScreenState extends State<NoteFormScreen> {
           _isSaving
               ? Padding(
                   padding: EdgeInsets.all(16.0),
-                  child: SizedBox(width: 24, height: 24, child: CircularProgressIndicator(color: Colors.blueAccent, strokeWidth: 2)),
+                  child: SizedBox(width: 24, height: 24, child: CircularProgressIndicator(color: Theme.of(context).colorScheme.primary, strokeWidth: 2)),
                 )
               : IconButton(
-                  icon: Icon(Icons.check, color: Colors.blueAccent),
+                  icon: Icon(Icons.check, color: Theme.of(context).colorScheme.primary),
                   onPressed: _saveNote,
                 )
         ],
@@ -184,31 +184,31 @@ class _NoteFormScreenState extends State<NoteFormScreen> {
               style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
               decoration: InputDecoration(
                 labelText: 'Titolo',
-                labelStyle: TextStyle(color: Colors.white.withOpacity(0.54)),
-                enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: theme.borderColor)),
-                focusedBorder: UnderlineInputBorder(borderSide: BorderSide(color: Colors.blueAccent)),
+                labelStyle: TextStyle(color: Colors.white.withValues(alpha: 0.54)),
+                enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.1))),
+                focusedBorder: UnderlineInputBorder(borderSide: BorderSide(color: Theme.of(context).colorScheme.primary)),
               ),
               validator: (val) => (val == null || val.isEmpty) ? 'Inserisci un titolo' : null,
             ),
             SizedBox(height: 24),
             Row(
               children: [
-                Text('Tipo: ', style: TextStyle(color: Colors.white.withOpacity(0.54))),
+                Text('Tipo: ', style: TextStyle(color: Colors.white.withValues(alpha: 0.54))),
                 SizedBox(width: 8),
                 ChoiceChip(
                   label: Text('Testo'),
                   selected: _noteType == 'TEXT',
                   onSelected: (val) => setState(() => _noteType = 'TEXT'),
-                  selectedColor: Colors.blueAccent.withValues(alpha: 0.3),
-                  labelStyle: TextStyle(color: _noteType == 'TEXT' ? Colors.blueAccent : Colors.white),
+                  selectedColor: Theme.of(context).colorScheme.primary.withValues(alpha: 0.3),
+                  labelStyle: TextStyle(color: _noteType == 'TEXT' ? Theme.of(context).colorScheme.primary : Colors.white),
                 ),
                 SizedBox(width: 8),
                 ChoiceChip(
                   label: Text('Lista spunte'),
                   selected: _noteType == 'CHECKLIST',
                   onSelected: (val) => setState(() => _noteType = 'CHECKLIST'),
-                  selectedColor: Colors.blueAccent.withValues(alpha: 0.3),
-                  labelStyle: TextStyle(color: _noteType == 'CHECKLIST' ? Colors.blueAccent : Colors.white),
+                  selectedColor: Theme.of(context).colorScheme.primary.withValues(alpha: 0.3),
+                  labelStyle: TextStyle(color: _noteType == 'CHECKLIST' ? Theme.of(context).colorScheme.primary : Colors.white),
                 ),
               ],
             ),

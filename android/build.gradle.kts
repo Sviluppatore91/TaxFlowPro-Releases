@@ -29,7 +29,7 @@ subprojects {
             val proj = this
             if (proj.extensions.findByName("android") != null) {
                 val androidExt = proj.extensions.getByName("android") as com.android.build.gradle.BaseExtension
-                androidExt.compileSdkVersion(36)
+                androidExt.compileSdkVersion(37)
             }
         }
     }

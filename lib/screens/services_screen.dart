@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import '../database/database_helper.dart';
 import '../models/models.dart';
-import '../widgets/gradient_scaffold.dart';
 import '../widgets/glass_container.dart';
+import '../widgets/service_card.dart';
 
 class ServicesScreen extends StatefulWidget {
   const ServicesScreen({super.key});
@@ -59,8 +59,8 @@ class _ServicesScreenState extends State<ServicesScreen> {
                   style: TextStyle(color: Colors.white),
                   decoration: InputDecoration(
                     labelText: 'Nome Servizio *',
-                    labelStyle: TextStyle(color: Colors.white.withOpacity(0.7)),
-                    enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: Colors.white.withOpacity(0.7))),
+                    labelStyle: TextStyle(color: Colors.white.withValues(alpha: 0.7)),
+                    enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.7))),
                   ),
                 ),
                 SizedBox(height: 16),
@@ -69,7 +69,7 @@ class _ServicesScreenState extends State<ServicesScreen> {
                     return Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('Colore (per grafico)', style: TextStyle(color: Colors.white.withOpacity(0.7), fontSize: 12)),
+                        Text('Colore (per grafico)', style: TextStyle(color: Colors.white.withValues(alpha: 0.7), fontSize: 12)),
                         SizedBox(height: 8),
                         Wrap(
                           spacing: 8,
@@ -106,7 +106,7 @@ class _ServicesScreenState extends State<ServicesScreen> {
                   children: [
                     TextButton(
                       onPressed: () => Navigator.pop(dialogContext),
-                      child: Text('ANNULLA', style: TextStyle(color: Colors.white.withOpacity(0.7))),
+                      child: Text('ANNULLA', style: TextStyle(color: Colors.white.withValues(alpha: 0.7))),
                     ),
                     SizedBox(width: 8),
                     ElevatedButton(
@@ -151,14 +151,14 @@ class _ServicesScreenState extends State<ServicesScreen> {
             children: [
               Text('Conferma Eliminazione', style: TextStyle(fontSize: 18, color: Colors.white, fontWeight: FontWeight.bold)),
               SizedBox(height: 16),
-              Text('Eliminando questo servizio, i pagamenti associati rimarranno senza servizio. Procedere?', style: TextStyle(color: Colors.white.withOpacity(0.7))),
+              Text('Eliminando questo servizio, i pagamenti associati rimarranno senza servizio. Procedere?', style: TextStyle(color: Colors.white.withValues(alpha: 0.7))),
               SizedBox(height: 24),
               Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
                   TextButton(
                     onPressed: () => Navigator.pop(context, false),
-                    child: Text('ANNULLA', style: TextStyle(color: Colors.white.withOpacity(0.7))),
+                    child: Text('ANNULLA', style: TextStyle(color: Colors.white.withValues(alpha: 0.7))),
                   ),
                   SizedBox(width: 8),
                   ElevatedButton(
@@ -182,66 +182,124 @@ class _ServicesScreenState extends State<ServicesScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return GradientScaffold(
-      appBar: AppBar(
-        title: Text('Servizi Erogati', style: TextStyle(color: Colors.white)),
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        iconTheme: IconThemeData(color: Colors.white),
-      ),
-      body: _isLoading
-          ? Center(child: CircularProgressIndicator(color: Colors.white))
-          : _services.isEmpty
-              ? Center(child: Text('Nessun servizio definito.', style: TextStyle(color: Colors.white.withOpacity(0.54))))
-              : ListView.builder(
-                  padding: const EdgeInsets.all(16),
-                  itemCount: _services.length,
-                  itemBuilder: (context, index) {
-                    final srv = _services[index];
-                    return Padding(
-                      padding: const EdgeInsets.only(bottom: 8.0),
-                      child: GlassContainer(
-                        child: Material(
-                          type: MaterialType.transparency,
-                          child: ListTile(
-                          leading: Icon(Icons.design_services, color: Colors.blueAccent),
-                          title: Text(srv.name, style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-                          trailing: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              if (srv.colorHex != null)
-                                Container(
-                                  margin: const EdgeInsets.only(right: 12),
-                                  width: 16,
-                                  height: 16,
-                                  decoration: BoxDecoration(
-                                    color: Color(int.parse(srv.colorHex!)),
-                                    shape: BoxShape.circle,
-                                    border: Border.all(color: Colors.white, width: 2),
-                                  ),
-                                ),
-                              IconButton(
-                                icon: Icon(Icons.edit, color: Colors.blueAccent),
-                                onPressed: () => _showServiceDialog(srv),
-                              ),
-                              IconButton(
-                                icon: Icon(Icons.delete, color: Colors.redAccent),
-                                onPressed: () => _deleteService(srv.id!),
-                              ),
-                            ],
-                          ),
-                        )),
-                      ),
-                    );
-                  },
+    return Scaffold(
+      backgroundColor: Colors.transparent,
+      body: SafeArea(
+        child: Column(
+          children: [
+            // App Bar
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 16.0),
+              child: Row(
+                children: [
+                  IconButton(
+                    icon: Icon(Icons.arrow_back_ios, color: Colors.white, size: 20),
+                    onPressed: () => Navigator.pop(context),
+                  ),
+                  Expanded(
+                    child: Text(
+                      'SERVICES & PRODUCTS',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold, letterSpacing: 1.2),
+                    ),
+                  ),
+                  IconButton(
+                    icon: Icon(Icons.settings_outlined, color: Colors.white, size: 24),
+                    onPressed: () {},
+                  ),
+                ],
+              ),
+            ),
+            
+            // Tabs
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 32.0),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Column(
+                      children: [
+                        Text('Services', style: TextStyle(color: Theme.of(context).colorScheme.secondary, fontSize: 16, fontWeight: FontWeight.bold)),
+                        SizedBox(height: 8),
+                        Container(height: 3, color: Theme.of(context).colorScheme.secondary),
+                      ],
+                    ),
+                  ),
+                  Expanded(
+                    child: Column(
+                      children: [
+                        Text('Products', style: TextStyle(color: Colors.white.withValues(alpha: 0.5), fontSize: 16)),
+                        SizedBox(height: 8),
+                        Container(height: 3, color: Colors.white.withValues(alpha: 0.1)),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            
+            SizedBox(height: 16),
+            
+            // List
+            Expanded(
+              child: _isLoading
+                  ? Center(child: CircularProgressIndicator(color: Theme.of(context).colorScheme.secondary))
+                  : _services.isEmpty
+                      ? Center(child: Text('Nessun servizio definito.', style: TextStyle(color: Colors.white.withValues(alpha: 0.54))))
+                      : ListView.builder(
+                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                          itemCount: _services.length,
+                          itemBuilder: (context, index) {
+                            final srv = _services[index];
+                            return ServiceCard(
+                              service: srv.toMap(),
+                              onTap: () {},
+                              onEdit: () => _showServiceDialog(srv),
+                              onDelete: () => _deleteService(srv.id!),
+                            );
+                          },
+                        ),
+            ),
+            
+            // Add custom service button
+            Padding(
+              padding: const EdgeInsets.all(24.0),
+              child: ElevatedButton(
+                onPressed: () => _showServiceDialog(),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.transparent,
+                  padding: EdgeInsets.zero,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(25),
+                  ),
+                ).copyWith(
+                  elevation: ButtonStyleButton.allOrNull(0.0),
                 ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => _showServiceDialog(),
-        backgroundColor: Colors.blueAccent,
-        child: Icon(Icons.add),
+                child: Ink(
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).colorScheme.secondary.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(25),
+                    border: Border.all(color: Theme.of(context).colorScheme.secondary.withValues(alpha: 0.5), width: 1.5),
+                    boxShadow: [
+                      BoxShadow(color: Theme.of(context).colorScheme.secondary.withValues(alpha: 0.2), blurRadius: 10, spreadRadius: 1)
+                    ],
+                  ),
+                  child: Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    alignment: Alignment.center,
+                    child: Text(
+                      'ADD CUSTOM SERVICE',
+                      style: TextStyle(color: Theme.of(context).colorScheme.secondary, fontSize: 14, fontWeight: FontWeight.bold, letterSpacing: 1.2),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
 }
-
 

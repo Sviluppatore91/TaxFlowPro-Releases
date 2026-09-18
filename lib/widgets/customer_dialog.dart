@@ -127,7 +127,7 @@ class _CustomerDialogState extends State<CustomerDialog> {
         ),
         ElevatedButton(
           onPressed: _isSaving ? null : _save,
-          style: ElevatedButton.styleFrom(backgroundColor: Colors.blueAccent),
+          style: ElevatedButton.styleFrom(backgroundColor: Theme.of(context).colorScheme.primary),
           child: _isSaving
               ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(color: Colors.white))
               : const Text('Salva', style: TextStyle(color: Colors.white)),

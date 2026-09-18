@@ -162,12 +162,7 @@ class _SecurityCenterScreenState extends State<SecurityCenterScreen> with Single
           formattedDate = DateFormat('HH:mm - dd/MM/yyyy').format(dt);
         }
 
-        IconData deviceIcon = Icons.device_unknown;
-        if (deviceType.contains('Cellulare')) {
-          deviceIcon = Icons.phone_android;
-        } else if (deviceType.contains('Computer')) {
-          deviceIcon = Icons.computer;
-        }
+
 
         bool isSuccess = eventType == 'login_success';
 

@@ -1,10 +1,10 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
-import 'package:provider/provider.dart';
+
 import '../services/data_import_service.dart';
 import '../database/database_helper.dart';
-import '../providers/app_theme_provider.dart';
+
 import '../widgets/customer_dialog.dart';
 
 class DataImportScreen extends StatefulWidget {
@@ -64,6 +64,7 @@ class _DataImportScreenState extends State<DataImportScreen> {
         });
         _mapDataToExpenses();
       } catch (e) {
+        if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Errore durante l\'importazione: $e')),
         );
@@ -85,15 +86,15 @@ class _DataImportScreenState extends State<DataImportScreen> {
           builder: (ctx) => AlertDialog(
             backgroundColor: const Color(0xFF1E1E24),
             title: Text('Cliente mancante', style: TextStyle(color: Colors.white)),
-            content: Text('Il cliente "${exp.customerName}" non esiste in anagrafica. Vuoi crearlo ora?', style: TextStyle(color: Colors.white.withOpacity(0.7))),
+            content: Text('Il cliente "${exp.customerName}" non esiste in anagrafica. Vuoi crearlo ora?', style: TextStyle(color: Colors.white.withValues(alpha: 0.7))),
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(ctx, false),
-                child: Text('Salta per ora', style: TextStyle(color: Colors.white.withOpacity(0.54))),
+                child: Text('Salta per ora', style: TextStyle(color: Colors.white.withValues(alpha: 0.54))),
               ),
               ElevatedButton(
                 onPressed: () => Navigator.pop(ctx, true),
-                style: ElevatedButton.styleFrom(backgroundColor: Colors.blueAccent),
+                style: ElevatedButton.styleFrom(backgroundColor: Theme.of(context).colorScheme.primary),
                 child: Text('Crea Cliente', style: TextStyle(color: Colors.white)),
               ),
             ],
@@ -101,6 +102,7 @@ class _DataImportScreenState extends State<DataImportScreen> {
         );
 
         if (confirm == true) {
+          if (!mounted) return;
           // Apri il customer_dialog
           bool? created = await showDialog<bool>(
             context: context,
@@ -183,8 +185,11 @@ class _DataImportScreenState extends State<DataImportScreen> {
         String m = row[methodKey].toString().toLowerCase();
         if (m.contains('fattur')) {
           method = 'Fattura';
-        } else if (m.contains('ritenuta')) method = "Ritenuta d'acconto";
-        else if (m.contains('contant')) method = 'Contanti';
+        } else if (m.contains('ritenuta')) {
+          method = "Ritenuta d'acconto";
+        } else if (m.contains('contant')) {
+          method = 'Contanti';
+        }
       }
 
       // Stato (Saldo - ATTESA)
@@ -229,7 +234,7 @@ class _DataImportScreenState extends State<DataImportScreen> {
   }
 
   Future<void> _createNewCustomer(ParsedExpense expense, int index) async {
-    bool? created = await showDialog<bool>(
+    await showDialog<bool>(
       context: context,
       builder: (ctx) => CustomerDialog(
         initialName: expense.customerName,
@@ -284,11 +289,13 @@ class _DataImportScreenState extends State<DataImportScreen> {
         saved++;
       }
       
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Importati $saved movimenti con successo!')),
       );
       Navigator.pop(context, true); // Return to previous screen
     } catch (e) {
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Errore salvataggio: $e')),
       );
@@ -299,7 +306,6 @@ class _DataImportScreenState extends State<DataImportScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final themeProvider = Provider.of<AppThemeProvider>(context);
     final theme = Theme.of(context);
 
     return Scaffold(
@@ -388,7 +394,7 @@ class _DataImportScreenState extends State<DataImportScreen> {
                                       labelText: 'Cliente',
                                       isDense: true,
                                     ),
-                                    value: expense.customerId,
+                                    initialValue: expense.customerId,
                                     items: [
                                       ..._customers.map((c) {
                                         return DropdownMenuItem<String>(
@@ -421,7 +427,7 @@ class _DataImportScreenState extends State<DataImportScreen> {
                                       labelText: 'Metodo',
                                       isDense: true,
                                     ),
-                                    value: expense.paymentMethod,
+                                    initialValue: expense.paymentMethod,
                                     items: ['Contanti', 'Fattura', 'Ritenuta d\'acconto'].map((e) => DropdownMenuItem(value: e, child: Text(e))).toList(),
                                     onChanged: (val) => setState(() => expense.paymentMethod = val!),
                                   ),

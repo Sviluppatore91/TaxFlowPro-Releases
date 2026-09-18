@@ -124,8 +124,8 @@ class _PaymentSummaryScreenState extends State<PaymentSummaryScreen> {
                         onPressed: () => Navigator.pop(context),
                       ),
                       SizedBox(width: 8),
-                      Image.asset('assets/images/logo.png', height: 40, errorBuilder: (ctx, err, trace) {
-                        return Icon(Icons.account_balance_wallet, color: Colors.blueAccent, size: 40);
+                      Image.asset('assets/TaxFlowPro_logo.jpg', height: 40, errorBuilder: (ctx, err, trace) {
+                        return Icon(Icons.account_balance_wallet, color: Theme.of(context).colorScheme.primary, size: 40);
                       }),
                       SizedBox(width: 12),
                       Text(
@@ -270,10 +270,10 @@ class _HoverEditButtonState extends State<HoverEditButton> {
           duration: const Duration(milliseconds: 200),
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           decoration: BoxDecoration(
-            color: _isHovering ? Colors.blueAccent : Colors.white10,
+            color: _isHovering ? Theme.of(context).colorScheme.primary : Colors.white10,
             borderRadius: BorderRadius.circular(8),
             boxShadow: _isHovering ? [
-              const BoxShadow(color: Colors.blueAccent, blurRadius: 10, spreadRadius: 2)
+              BoxShadow(color: Theme.of(context).colorScheme.primary, blurRadius: 10, spreadRadius: 2)
             ] : [],
           ),
           child: Row(
@@ -294,6 +294,5 @@ class _HoverEditButtonState extends State<HoverEditButton> {
     );
   }
 }
-
 
 

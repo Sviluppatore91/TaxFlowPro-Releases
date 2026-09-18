@@ -89,8 +89,8 @@ class _InvoiceSummaryScreenState extends State<InvoiceSummaryScreen> {
                         onPressed: () => Navigator.pop(context),
                       ),
                       SizedBox(width: 8),
-                      Image.asset('assets/images/logo.png', height: 40, errorBuilder: (ctx, err, trace) {
-                        return Icon(Icons.receipt_long, color: Colors.blueAccent, size: 40);
+                      Image.asset('assets/TaxFlowPro_logo.jpg', height: 40, errorBuilder: (ctx, err, trace) {
+                        return Icon(Icons.receipt_long, color: Theme.of(context).colorScheme.primary, size: 40);
                       }),
                       SizedBox(width: 12),
                       Text(

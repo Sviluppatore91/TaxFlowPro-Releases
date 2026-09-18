@@ -4,10 +4,8 @@ import 'categories_screen.dart';
 import 'services_screen.dart';
 import 'users_screen.dart';
 import 'settings_screen.dart';
-import 'data_import_screen.dart';
 import 'security_center_screen.dart';
 import 'changelog_screen.dart';
-import 'quotes_screen.dart';
 import 'reports_screen.dart';
 import 'package:provider/provider.dart';
 import '../providers/app_theme_provider.dart';
@@ -87,7 +85,7 @@ class MenuScreen extends StatelessWidget {
       decoration: BoxDecoration(
         color: theme.cardColor,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: theme.borderColor),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
       ),
       child: Material(
         type: MaterialType.transparency,
@@ -98,7 +96,7 @@ class MenuScreen extends StatelessWidget {
           style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
           glowColor: theme.primaryColor,
         ),
-        trailing: Icon(Icons.arrow_forward_ios, color: Colors.white.withOpacity(0.54), size: 16),
+        trailing: Icon(Icons.arrow_forward_ios, color: Colors.white.withValues(alpha: 0.54), size: 16),
         onTap: () {
           Navigator.push(context, MaterialPageRoute(builder: (_) => screen));
         },
